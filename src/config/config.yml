@@ -1,0 +1,27 @@
+sqs:
+  local:
+    params:
+      region: sqs
+      endpoint: http://sqs:9324
+      apiVersion: "2012-11-05"
+    queueName:
+      - cvs-edh-test-results-q
+  remote:
+    params:
+      apiVersion: "2012-11-05"
+    queueName:
+      - cvs-edh-test-results-${BRANCH}-queue
+
+targets:
+  test-results:
+    queue: vehicle-tests
+    endpoints:
+      INSERT: /test-results
+      MODIFY: /test-results/
+      REMOVE:
+  activities:
+    queue: site-activities
+    endpoints:
+      INSERT:
+      MODIFY:
+      REMOVE:
