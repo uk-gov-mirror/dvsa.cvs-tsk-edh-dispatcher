@@ -20,7 +20,7 @@ export class DispatchDAO {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
-    const messageParams = this.getMessageParams("PUT", path, body)
+    const messageParams = this.getMessageParams("PUT", path, body);
     return this.request.put(messageParams);
   }
 
@@ -33,7 +33,7 @@ export class DispatchDAO {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
-    const messageParams = this.getMessageParams("POST", path, body)
+    const messageParams = this.getMessageParams("POST", path, body);
     return this.request.post(messageParams);
   }
 
@@ -42,15 +42,15 @@ export class DispatchDAO {
    * @param body - the payload to send
    * @param path - the path extension beyond the base
    */
-  public async deleteMessage(body: string, path: string ) {
+  public async deleteMessage(path: string ) {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
-    const messageParams = this.getMessageParams("DELETE", path, body)
-    return this.request.post(messageParams);
+    const messageParams = this.getMessageParams("DELETE", path);
+    return this.request.delete(messageParams);
   }
 
-  private getMessageParams = (method: string, path: string, body: any) => {
+  private getMessageParams = (method: string, path: string, body?: any) => {
     return {
       method,
       uri: `${this.config.baseUrl}/${path}`,

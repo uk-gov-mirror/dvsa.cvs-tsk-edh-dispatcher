@@ -62,7 +62,7 @@ class Configuration {
      * Retrieves the Targets config
      * @returns ITargetConfig[]
      */
-    public getTargets(): ITargetConfig[] {
+    public getTargets(): ITargetConfig {
         return this.config.targets;
     }
 

@@ -4,8 +4,13 @@ export interface IStreamRecord {
   eventSourceARN: string;
 }
 
+export interface IBody {
+  eventType: string;
+  body: any;
+}
+
 export interface ITarget {
-  queueName: string;
+  queue: string;
   endpoints: {
     INSERT: string;
     MODIFY: string;

@@ -5,7 +5,7 @@ import {PromiseResult} from "aws-sdk/lib/request";
 import {SendMessageResult} from "aws-sdk/clients/sqs";
 import {GetRecordsOutput} from "aws-sdk/clients/dynamodbstreams";
 import {getTargetFromSourceARN} from "../utils/Utils";
-import {IStreamRecord} from "../models";
+import {IBody, IStreamRecord} from "../models";
 import {DispatchDAO} from "../services/DispatchDAO";
 import requestPromise from "request-promise";
 
@@ -29,14 +29,14 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
     // Instantiate the Simple Queue Service
     const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise));
     const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
+    console.log("Records: ", records);
 
     records.forEach((record: IStreamRecord) => {
+        console.log("Record: ", record);
         const target = getTargetFromSourceARN(record.eventSourceARN);
-        const eventBody = JSON.parse(record.body);
-        dispatchService.processEvent(eventBody, target);
-        // const eventType = eventBody.eventType; //INSERT, MODIFY or REMOVE
-        // const eventPayload = eventBody.body;
-
+        const eventBody: IBody = JSON.parse(record.body);
+        const output = dispatchService.processEvent(eventBody, target);
+        console.log("Output: ", output);
         // sendMessagePromises.push(dispatchService.sendMessage(JSON.stringify(message), targetQueue))
     });
 
