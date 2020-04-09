@@ -17,8 +17,8 @@ targets:
     queue: vehicle-tests
     endpoints:
       INSERT: /test-results
-      MODIFY: /test-results/
-      REMOVE:
+      MODIFY: /test-results/${testResultId}
+      REMOVE: /test-results/${testResultId}
   activities:
     queue: site-activities
     endpoints:
