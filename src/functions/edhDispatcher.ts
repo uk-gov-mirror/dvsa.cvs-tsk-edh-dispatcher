@@ -20,6 +20,8 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
         console.error("ERROR: event is not defined.");
         return;
     }
+    console.log("Event: ", event);
+
     const records = event.Records as IStreamRecord[];
     if (!records || !records.length) {
         console.error("ERROR: No Records in event: ", event);
