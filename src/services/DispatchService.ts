@@ -56,7 +56,7 @@ class DispatchService {
     public processPath(path: string, body: any) {
         const replaceRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
         const matches: RegExpMatchArray | null = path.match(replaceRegex);
-
+        console.log("Keys", body.Keys);
         if (matches) {
             matches.forEach((match: string) => {
                 const matchString = match.substring(2, match.length - 1);
