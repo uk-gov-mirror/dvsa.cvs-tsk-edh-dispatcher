@@ -60,9 +60,10 @@ class DispatchService {
         if (matches) {
             matches.forEach((match: string) => {
                 const matchString = match.substring(1, match.length - 1);
-
+                // Keys come in as {name: {"S": "100"}} - grab actual value
+                const replVal = Object.values(body.Keys[matchString])[0] as string;
                 // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
-                path = path.replace(match, body.Keys[matchString]);
+                path = path.replace(match, replVal);
             });
         }
         console.log("Processed path: ", path);

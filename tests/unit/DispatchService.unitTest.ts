@@ -6,11 +6,13 @@ describe("Dispatch Service", () => {
     const daoMock = jest.fn();
     const svc = new DispatchService(new daoMock());
     describe("with path containing regex match", () => {
-      const path = "/test-string/{SystemNumber}";
+      const path = "/test-string/{testResultId}";
       it("replaces it with the matching key of the event", () => {
         const event = {
           "Keys":{
-            "SystemNumber": "101"
+            "testResultId": {
+              S: "101"
+            }
           },
           "NewImage":{
             "Message":{
