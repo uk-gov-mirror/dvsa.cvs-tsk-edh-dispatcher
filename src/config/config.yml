@@ -14,13 +14,13 @@ sqs:
 
 targets:
   test-results:
-    queue: vehicle-tests
+    queue: test-results
     endpoints:
       INSERT: /test-results
-      MODIFY: /test-results/${testResultId}
-      REMOVE: /test-results/${testResultId}
+      MODIFY: /test-results/{testResultId}
+      REMOVE: /test-results/{testResultId}
   activities:
-    queue: site-activities
+    queue: activities
     endpoints:
       INSERT:
       MODIFY:

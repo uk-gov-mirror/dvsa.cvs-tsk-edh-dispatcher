@@ -54,12 +54,12 @@ class DispatchService {
     }
 
     public processPath(path: string, body: any) {
-        const replaceRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
+        const replaceRegex: RegExp = /{(\w+\b):?(\w+\b)?}/g;
         const matches: RegExpMatchArray | null = path.match(replaceRegex);
         console.log("Keys", body.Keys);
         if (matches) {
             matches.forEach((match: string) => {
-                const matchString = match.substring(2, match.length - 1);
+                const matchString = match.substring(1, match.length - 1);
 
                 // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
                 path = path.replace(match, body.Keys[matchString]);

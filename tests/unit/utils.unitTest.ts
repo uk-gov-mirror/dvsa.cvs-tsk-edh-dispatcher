@@ -10,7 +10,7 @@ describe("Utils", () => {
       it("gets target from config properly", () => {
         // @ts-ignore
         const expected = Configuration.getInstance().getTargets()["test-results"];
-        const target = getTargetFromSourceARN("arn:aws:dynamodb:horse-east-8:00626016:table/vehicle-tests/stream/2024-03-30T15:55:39.197");
+        const target = getTargetFromSourceARN("arn:aws:sqs:eu-west-1:006106226016:cvs-edh-dispatcher-test-results-cvsb-10773-queue");
         expect(target).toEqual(expected)
       });
     });
