@@ -37,12 +37,15 @@ class DispatchService {
                 console.log("in INSERT");
                 updateContent = eventBody.NewImage;
                 path = this.processPath(target.endpoints.INSERT, eventBody);
-                return this.dao.postMessage(eventBody, path);
+                return this.dao.postMessage(updateContent, path);
             case EVENT_TYPE.MODIFY:
                 console.log("in MODIFY");
                 updateContent = eventBody.NewImage;
                 path = this.processPath(target.endpoints.MODIFY, eventBody);
-                return this.dao.putMessage(eventBody, path);
+                console.log("Sending body: ", updateContent);
+                console.log("Sending path: ", path);
+
+                return this.dao.putMessage(updateContent, path);
             case EVENT_TYPE.REMOVE:
                 console.log("in REMOVE");
                 path = this.processPath(target.endpoints.REMOVE, eventBody);
@@ -62,7 +65,6 @@ class DispatchService {
                 const matchString = match.substring(1, match.length - 1);
                 // Keys come in as {name: {"S": "100"}} - grab actual value
                 const replVal = Object.values(body.Keys[matchString])[0] as string;
-                // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
                 path = path.replace(match, replVal);
             });
         }

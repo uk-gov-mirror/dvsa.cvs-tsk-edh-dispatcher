@@ -8,6 +8,23 @@ describe("edhDispatcher function", () => {
   const ctx: Context = null;
   // @ts-ignore
   Configuration.instance = new Configuration("../../src/config/config.yml");
+
+  describe("if the event is undefined", () => {
+    it("should return undefined", async () => {
+      expect.assertions(1);
+      const result = await edhDispatcher(undefined, ctx, () => { return; });
+      expect(result).toBe(undefined);
+    });
+  });
+
+  describe("if the event has no records", () => {
+    it("should return undefined", async () => {
+      expect.assertions(1);
+      const result = await edhDispatcher({something: "not records"}, ctx, () => { return; });
+      expect(result).toBe(undefined);
+    });
+  });
+
   describe("with good event", () => {
     it("invokes the dispatch service with the right body and target", async () => {
       const body = {test: "value"};

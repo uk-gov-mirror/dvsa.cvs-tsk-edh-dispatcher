@@ -28,19 +28,23 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
 
     // Instantiate the Simple Queue Service
     const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise));
-    const sendMessagePromises: Array<Promise<PromiseResult<SendMessageResult, AWSError>>> = [];
+    const sendMessagePromises: Array<Promise<any>> = [];
     console.log("Records: ", records);
 
     records.forEach((record: IStreamRecord) => {
         console.log("Record: ", record);
         const target = getTargetFromSourceARN(record.eventSourceARN);
         const eventBody: IBody = JSON.parse(record.body);
-        const output = dispatchService.processEvent(eventBody, target);
-        console.log("Output: ", output);
-        // sendMessagePromises.push(dispatchService.sendMessage(JSON.stringify(message), targetQueue))
+        const call = dispatchService.processEvent(eventBody, target) as Promise<any>;
+        console.log("Output: ", call);
+        sendMessagePromises.push(call);
     });
 
     return Promise.all(sendMessagePromises)
+    .then((resp) => {
+        console.log("Response", resp)
+        return resp;
+    })
     .catch((error: AWSError) => {
         console.error(error);
         throw error;

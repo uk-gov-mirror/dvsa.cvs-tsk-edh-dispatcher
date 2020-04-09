@@ -16,11 +16,12 @@ export class DispatchDAO {
    * @param body - the payload to send
    * @param path - the path extension beyond the base
    */
-  public async putMessage(body: string, path: string, ) {
+  public async putMessage(body: any, path: string, ) {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
     const messageParams = this.getMessageParams("PUT", path, body);
+    console.log("message parameters: ", messageParams);
     return this.request.put(messageParams);
   }
 
@@ -29,11 +30,12 @@ export class DispatchDAO {
    * @param body - the payload to send
    * @param path - the path extension beyond the base
    */
-  public async postMessage(body: string, path: string ) {
+  public async postMessage(body: any, path: string ) {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
     const messageParams = this.getMessageParams("POST", path, body);
+    console.log("message parameters: ", messageParams);
     return this.request.post(messageParams);
   }
 
@@ -47,6 +49,7 @@ export class DispatchDAO {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
     const messageParams = this.getMessageParams("DELETE", path);
+    console.log("message parameters: ", messageParams);
     return this.request.delete(messageParams);
   }
 

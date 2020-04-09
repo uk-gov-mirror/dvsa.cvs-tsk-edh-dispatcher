@@ -31,6 +31,35 @@ describe("Dispatch Service", () => {
         expect(output).toEqual("/test-string/101")
       });
     });
+    describe("with path containing multiple regex match", () => {
+      const path = "/test-string/{testResultId}/{secondKeyName}";
+      it("replaces all with the matching keys of the event", () => {
+        const event = {
+          "Keys":{
+            "testResultId": {
+              S: "101"
+            },
+            "secondKeyName": {
+              N: 42
+            }
+          },
+          "NewImage":{
+            "Message":{
+              "S":"New item!"
+            },
+            "Id":{
+              "N":"101"
+            }
+          },
+          "SequenceNumber":"111",
+          "SizeBytes":26,
+          "StreamViewType":"NEW_AND_OLD_IMAGES"
+        };
+
+        const output = svc.processPath(path, event);
+        expect(output).toEqual("/test-string/101/42")
+      });
+    });
     describe("with path containing no regex matches", () => {
       const path = "/test-string/SystemNumber";
       it("returns the original path", () => {
@@ -85,7 +114,7 @@ describe("Dispatch Service", () => {
     describe("with invalid event type", () => {
       const event = {
         eventType: "NOT_A_THING",
-        body: {}
+        body: {NewImage: {}}
       };
       it("invokes nothing, returns nothing", () => {
         const output = svc.processEvent(event, target);
@@ -100,7 +129,7 @@ describe("Dispatch Service", () => {
     describe("with valid INSERT event type", () => {
       const event = {
         eventType: "INSERT",
-        body
+        body: {NewImage: body}
       };
       it("invokes the POST method with the right details", () => {
         postMock.mockReturnValueOnce("posted");
@@ -116,7 +145,7 @@ describe("Dispatch Service", () => {
     describe("with valid MODIFY event type", () => {
       const event = {
         eventType: "MODIFY",
-        body
+        body: {NewImage: body}
       };
       it("invokes the PUT method with the right details", () => {
         const output = svc.processEvent(event, target);
