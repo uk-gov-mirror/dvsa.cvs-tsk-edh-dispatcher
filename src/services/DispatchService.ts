@@ -1,7 +1,10 @@
 import {Configuration} from "../utils/Configuration";
 import {ERROR, EVENT_TYPE} from "../models/enums";
-import {IBody, ITarget} from "../models";
+import {IBody, IStreamRecord, ITarget} from "../models";
 import {DispatchDAO} from "./DispatchDAO";
+import {AWSError} from "aws-sdk";
+import {SQService} from "./SQService";
+import {getTargetFromSourceARN} from "../utils/Utils";
 // tslint:disable-next-line
 const AWSXRay = require("aws-xray-sdk");
 
@@ -12,14 +15,16 @@ const AWSXRay = require("aws-xray-sdk");
 class DispatchService {
     private readonly config: any;
     private dao: DispatchDAO;
+    private sqs: SQService;
 
     /**
      * Constructor for the ActivityService class
      * @param sqsClient - The Simple Queue Service client
      */
-    constructor(dao: DispatchDAO) {
+    constructor(dao: DispatchDAO, sqs: SQService) {
         this.config = Configuration.getInstance().getConfig();
         this.dao = dao;
+        this.sqs = sqs;
     }
 
     public processEvent(eventPayload: IBody,  target: ITarget) {
@@ -72,6 +77,18 @@ class DispatchService {
         return path;
     };
 
+    public async isRetryableError(error: AWSError, records: IStreamRecord[]): Promise<boolean> {
+        if (error.statusCode >= 400 && error.statusCode < 429) {
+            await this.sendRecordToDLQ(records);
+            return false;
+        }
+        return true;
+    };
+
+    private async sendRecordToDLQ(records: IStreamRecord[]) {
+        const target = getTargetFromSourceARN(records[0].eventSourceARN);
+        await this.sqs.sendMessage(JSON.stringify(records), target.dlQueue);
+    }
 }
 
 export {DispatchService};

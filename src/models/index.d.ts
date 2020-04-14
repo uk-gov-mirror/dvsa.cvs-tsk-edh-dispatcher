@@ -11,6 +11,7 @@ export interface IBody {
 
 export interface ITarget {
   queue: string;
+  dlQueue: string;
   endpoints: {
     INSERT: string;
     MODIFY: string;
@@ -24,5 +25,5 @@ export interface ITargetConfig {
 
 export interface ISecretConfig {
   baseUrl: string;
-  accessToken: string;
+  apiKey: string;
 }

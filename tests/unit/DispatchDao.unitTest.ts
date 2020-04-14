@@ -8,7 +8,7 @@ describe("DispatchDAO", () => {
 
   jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue({
     baseUrl: "http://myEndpoint.com",
-    accessToken: "abc123"
+    apiKey: "abc123"
   });
   const putMock = jest.fn();
   const postMock = jest.fn();

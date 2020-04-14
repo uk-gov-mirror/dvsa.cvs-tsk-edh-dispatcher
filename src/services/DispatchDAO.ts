@@ -58,7 +58,7 @@ export class DispatchDAO {
       method,
       uri: `${this.config.baseUrl}/${path}`,
       headers: {
-        Authorization: "Bearer " + this.config.accessToken
+        Authorization: "Bearer " + this.config.apiKey
       },
       body: JSON.stringify(body)
     };

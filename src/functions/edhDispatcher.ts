@@ -8,6 +8,7 @@ import {getTargetFromSourceARN} from "../utils/Utils";
 import {IBody, IStreamRecord} from "../models";
 import {DispatchDAO} from "../services/DispatchDAO";
 import requestPromise from "request-promise";
+import {SQService} from "../services/SQService";
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -29,7 +30,7 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
     }
 
     // Instantiate the Simple Queue Service
-    const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise));
+    const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise), new SQService(new SQS()));
     const sendMessagePromises: Array<Promise<any>> = [];
     console.log("Records: ", records);
 
@@ -44,12 +45,14 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
 
     return Promise.all(sendMessagePromises)
     .then((resp) => {
-        console.log("Response", resp)
+        console.log("Response", resp);
         return resp;
     })
-    .catch((error: AWSError) => {
+    .catch(async (error: AWSError) => {
         console.error(error);
-        throw error;
+        if (await dispatchService.isRetryableError(error, records)){
+            throw error;
+        } else return;
     });
 };
 

@@ -1,10 +1,13 @@
 import {DispatchService} from "../../src/services/DispatchService";
 import {ITarget} from "../../src/models";
+import {AWSError} from "aws-sdk";
+import * as utils from "../../src/utils/Utils";
 
 describe("Dispatch Service", () => {
   describe("processPath", () => {
     const daoMock = jest.fn();
-    const svc = new DispatchService(new daoMock());
+    const sqsMock = jest.fn();
+    const svc = new DispatchService(new daoMock(), new sqsMock());
     describe("with path containing regex match", () => {
       const path = "/test-string/{testResultId}";
       it("replaces it with the matching key of the event", () => {
@@ -93,6 +96,7 @@ describe("Dispatch Service", () => {
     const putMock = jest.fn();
     const postMock = jest.fn();
     const deleteMock = jest.fn();
+    const sqsMock = jest.fn();
     const daoMock = jest.fn().mockImplementation(() => {
       return {
         putMessage: putMock,
@@ -102,6 +106,7 @@ describe("Dispatch Service", () => {
     });
     const target: ITarget = {
       queue: "",
+      dlQueue: "",
       endpoints: {
         INSERT: "Ipath",
         MODIFY: "Mpath",
@@ -109,7 +114,7 @@ describe("Dispatch Service", () => {
       }
     };
     const body = {"test": "value"};
-    const svc = new DispatchService(new daoMock());
+    const svc = new DispatchService(new daoMock(), new sqsMock());
 
     describe("with invalid event type", () => {
       const event = {
@@ -164,7 +169,7 @@ describe("Dispatch Service", () => {
         body
       };
       it("invokes the DELETE method with the right details", () => {
-        const svc = new DispatchService(new daoMock());
+        const svc = new DispatchService(new daoMock(), new sqsMock());
 
         const output = svc.processEvent(event, target);
         expect(output).toBeUndefined();
@@ -172,6 +177,35 @@ describe("Dispatch Service", () => {
         expect(postMock).not.toHaveBeenCalled();
         expect(deleteMock).toHaveBeenCalled();
         expect(deleteMock).toHaveBeenCalledWith(target.endpoints.REMOVE)
+      });
+    });
+  });
+  describe("isRetryableError", ()  => {
+    beforeEach(()  => {
+      jest.clearAllMocks();
+    });
+
+    const daoMock = jest.fn();
+    const sqsMock = jest.fn();
+    const svc = new DispatchService(new daoMock(), new sqsMock());
+
+    describe("with  400-ish  error", ()  =>  {
+      it("returns false and sends message to DLQ", async  () => {
+        const error = {statusCode: 404} as AWSError;
+        const sendRecordMock = jest.spyOn(DispatchService.prototype as any, "sendRecordToDLQ").mockResolvedValue("");
+        const output = await svc.isRetryableError(error, []);
+        expect(output).toBeFalsy();
+        expect(sendRecordMock).toHaveBeenCalled();
+      });
+    });
+
+    describe("with  500-ish  error", ()  =>  {
+      it("returns false and doesn't send message", async  () => {
+        const error = {statusCode: 500} as AWSError;
+        const sendRecordMock = jest.spyOn(DispatchService.prototype as any, "sendRecordToDLQ").mockResolvedValue("");
+        const output = await svc.isRetryableError(error, []);
+        expect(output).toBeTruthy();
+        expect(sendRecordMock).not.toHaveBeenCalled();
       });
     });
   });
