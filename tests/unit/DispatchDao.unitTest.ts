@@ -6,10 +6,12 @@ describe("DispatchDAO", () => {
     jest.clearAllMocks();
   });
 
-  jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue({
+  const secrets = {
     baseUrl: "http://myEndpoint.com",
-    apiKey: "abc123"
-  });
+    apiKey: "abc123",
+    host: "http://something"
+  };
+  jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(secrets);
   const putMock = jest.fn();
   const postMock = jest.fn();
   const deleteMock = jest.fn();
@@ -30,7 +32,8 @@ describe("DispatchDAO", () => {
       expect(putMock.mock.calls[0][0].method).toEqual("PUT");
       expect(putMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(putMock.mock.calls[0][0].body).toEqual("{}");
-      expect(putMock.mock.calls[0][0].headers.Authorization).toEqual("Bearer abc123");
+      expect(putMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
+      expect(putMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);
     })
   });
   describe("postMessage", () => {
@@ -42,8 +45,8 @@ describe("DispatchDAO", () => {
       expect(postMock.mock.calls[0][0].method).toEqual("POST");
       expect(postMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(postMock.mock.calls[0][0].body).toEqual("{}");
-      expect(postMock.mock.calls[0][0].headers.Authorization).toEqual("Bearer abc123");
-    })
+      expect(postMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
+      expect(postMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);    })
   });
   describe("deleteMessage", () => {
     it("invokes promise.delete with correct message", async () => {
@@ -54,7 +57,7 @@ describe("DispatchDAO", () => {
       expect(deleteMock.mock.calls[0][0].method).toEqual("DELETE");
       expect(deleteMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(deleteMock.mock.calls[0][0].body).toBeUndefined();
-      expect(deleteMock.mock.calls[0][0].headers.Authorization).toEqual("Bearer abc123");
-    })
+      expect(deleteMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
+      expect(deleteMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);    })
   });
 });
