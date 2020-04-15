@@ -22,7 +22,8 @@ targets:
       REMOVE: test-results/{testResultId}
   activities:
     queue: activities
+    dlQueue: cvs-edh-dispatcher-activities-${BRANCH}-dlq
     endpoints:
-      INSERT:
-      MODIFY:
-      REMOVE:
+      INSERT: activities
+      MODIFY: activities/{id}
+      REMOVE: activities/{id}
