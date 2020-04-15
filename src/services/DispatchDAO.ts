@@ -59,7 +59,8 @@ export class DispatchDAO {
       uri: `${this.config.baseUrl}/${path}`,
       headers: {
         "x-api-key": this.config.apiKey,
-        host: this.config.host
+        host: this.config.host,
+        AWSTraceHeader: process.env._X_AMZN_TRACE_ID
       },
       body: JSON.stringify(body)
     };

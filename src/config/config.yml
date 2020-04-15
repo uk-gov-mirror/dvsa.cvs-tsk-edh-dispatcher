@@ -17,9 +17,9 @@ targets:
     queue: test-results
     dlQueue: cvs-edh-dispatcher-test-results-${BRANCH}-dlq
     endpoints:
-      INSERT: /test-results
-      MODIFY: /test-results/{testResultId}
-      REMOVE: /test-results/{testResultId}
+      INSERT: test-results
+      MODIFY: test-results/{testResultId}
+      REMOVE: test-results/{testResultId}
   activities:
     queue: activities
     endpoints:
