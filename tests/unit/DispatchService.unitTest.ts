@@ -1,6 +1,6 @@
 import {DispatchService} from "../../src/services/DispatchService";
 import {ITarget} from "../../src/models";
-import {AWSError} from "aws-sdk";
+import {AWSError, DynamoDB} from "aws-sdk";
 import * as utils from "../../src/utils/Utils";
 
 describe("Dispatch Service", () => {
@@ -113,7 +113,7 @@ describe("Dispatch Service", () => {
         REMOVE: "Rpath",
       }
     };
-    const body = {"test": "value"};
+    const body = {"test": {"S": "value"}};
     const svc = new DispatchService(new daoMock(), new sqsMock());
 
     describe("with invalid event type", () => {
@@ -143,7 +143,7 @@ describe("Dispatch Service", () => {
         expect(putMock).not.toHaveBeenCalled();
         expect(postMock).toHaveBeenCalled();
         expect(deleteMock).not.toHaveBeenCalled();
-        expect(postMock).toHaveBeenCalledWith(body, target.endpoints.INSERT)
+        expect(postMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), target.endpoints.INSERT)
       });
     });
 
@@ -158,7 +158,7 @@ describe("Dispatch Service", () => {
         expect(putMock).toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalled();
         expect(deleteMock).not.toHaveBeenCalled();
-        expect(putMock).toHaveBeenCalledWith(body, target.endpoints.MODIFY)
+        expect(putMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), target.endpoints.MODIFY)
 
       });
     });

@@ -2,7 +2,7 @@ import {Configuration} from "../utils/Configuration";
 import {ERROR, EVENT_TYPE} from "../models/enums";
 import {IBody, IStreamRecord, ITarget} from "../models";
 import {DispatchDAO} from "./DispatchDAO";
-import {AWSError} from "aws-sdk";
+import {AWSError, DynamoDB} from "aws-sdk";
 import {SQService} from "./SQService";
 import {getTargetFromSourceARN} from "../utils/Utils";
 // tslint:disable-next-line
@@ -40,16 +40,15 @@ class DispatchService {
         switch (eventType) {
             case EVENT_TYPE.INSERT:
                 console.log("in INSERT");
-                updateContent = eventBody.NewImage;
+                updateContent = DynamoDB.Converter.unmarshall(eventBody.NewImage);
                 path = this.processPath(target.endpoints.INSERT, eventBody);
                 return this.dao.postMessage(updateContent, path);
             case EVENT_TYPE.MODIFY:
                 console.log("in MODIFY");
-                updateContent = eventBody.NewImage;
+                updateContent = DynamoDB.Converter.unmarshall(eventBody.NewImage);
                 path = this.processPath(target.endpoints.MODIFY, eventBody);
                 console.log("Sending body: ", updateContent);
                 console.log("Sending path: ", path);
-
                 return this.dao.putMessage(updateContent, path);
             case EVENT_TYPE.REMOVE:
                 console.log("in REMOVE");
