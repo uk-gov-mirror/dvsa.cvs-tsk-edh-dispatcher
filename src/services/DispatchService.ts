@@ -1,12 +1,13 @@
 import {Configuration} from "../utils/Configuration";
 import {ERROR, EVENT_TYPE} from "../models/enums";
-import {IBody, IStreamRecord, ITarget} from "../models";
+import {IBody, ISecretConfig, IStreamRecord, ITarget} from "../models";
 import {DispatchDAO} from "./DispatchDAO";
 import {AWSError, DynamoDB} from "aws-sdk";
 import {SQService} from "./SQService";
 import {getTargetFromSourceARN} from "../utils/Utils";
 // tslint:disable-next-line
 const AWSXRay = require("aws-xray-sdk");
+const Enforcer = require("openapi-enforcer");
 
 
 /**
@@ -27,36 +28,77 @@ class DispatchService {
         this.sqs = sqs;
     }
 
-    public processEvent(eventPayload: IBody,  target: ITarget) {
-        const eventType = eventPayload.eventType; //INSERT, MODIFY or REMOVE
-        const eventBody = eventPayload.body;
-
+    public processEvent(record: IStreamRecord) {
+        const target: ITarget = getTargetFromSourceARN(record.eventSourceARN);
+        const eventPayload: IBody = JSON.parse(record.body);
         console.log("eventPayload: ", eventPayload);
-        let path: string;
 
-        let updateContent;
+        const eventType = eventPayload.eventType; //INSERT, MODIFY or REMOVE
 
-        console.log("Event type: ", eventType);
         switch (eventType) {
             case EVENT_TYPE.INSERT:
-                console.log("in INSERT");
-                updateContent = DynamoDB.Converter.unmarshall(eventBody.NewImage);
-                path = this.processPath(target.endpoints.INSERT, eventBody);
-                return this.dao.postMessage(updateContent, path);
+                return this.sendPost(eventPayload,target);
             case EVENT_TYPE.MODIFY:
-                console.log("in MODIFY");
-                updateContent = DynamoDB.Converter.unmarshall(eventBody.NewImage);
-                path = this.processPath(target.endpoints.MODIFY, eventBody);
-                console.log("Sending body: ", updateContent);
-                console.log("Sending path: ", path);
-                return this.dao.putMessage(updateContent, path);
+                return this.sendPut(eventPayload, target);
             case EVENT_TYPE.REMOVE:
-                console.log("in REMOVE");
-                path = this.processPath(target.endpoints.REMOVE, eventBody);
-                return this.dao.deleteMessage(path);
+                return this.sendDelete(eventPayload, target);
             default:
                 console.error(ERROR.NO_HANDLER_METHOD);
-                break;
+                return this.sendRecordToDLQ(eventPayload, target);
+        }
+    }
+
+    private async sendPost(event: IBody, target: ITarget): Promise<any> {
+        const updateContent = DynamoDB.Converter.unmarshall(event.body.NewImage);
+        const path = this.processPath(target.endpoints.INSERT, event.body);
+        if(await this.isValidMessageBody(updateContent, target)) {
+            try {
+                return await this.dao.postMessage(updateContent, path);
+            } catch (e) {
+                console.log(e);
+                if (this.isRetryableError(e)) {
+                    return Promise.reject("Failed to send");
+                } else {
+                    this.sendRecordToDLQ(event, target);
+                }
+            }
+        } else {
+            console.log("Failed validation on event. Sending to DLQ");
+            this.sendRecordToDLQ(event, target);
+        }
+    }
+
+    private async sendPut(event: IBody, target: ITarget): Promise<any> {
+        const updateContent = DynamoDB.Converter.unmarshall(event.body.NewImage);
+        const path = this.processPath(target.endpoints.MODIFY, event.body);
+        if(await this.isValidMessageBody(updateContent, target)) {
+            try {
+                return await this.dao.putMessage(updateContent, path);
+            } catch (e) {
+                console.log(e);
+                if (this.isRetryableError(e)) {
+                    return Promise.reject("Failed to send");
+                } else {
+                    this.sendRecordToDLQ(event, target);
+                }
+            }
+        } else {
+            console.log("Failed validation on event. Sending to DLQ");
+            this.sendRecordToDLQ(event, target);
+        }
+    }
+
+    private async sendDelete(event: IBody, target: ITarget): Promise<any> {
+        const path = this.processPath(target.endpoints.REMOVE, event.body);
+        try {
+            return await this.dao.deleteMessage(path);
+        } catch (e) {
+            console.log("Failed to send request: ", e);
+            if (this.isRetryableError(e)) {
+                return Promise.reject("Failed to send");
+            } else {
+                this.sendRecordToDLQ(event, target);
+            }
         }
     }
 
@@ -76,17 +118,33 @@ class DispatchService {
         return path;
     };
 
-    public async isRetryableError(error: AWSError, records: IStreamRecord[]): Promise<boolean> {
-        if (error.statusCode >= 400 && error.statusCode < 429) {
-            await this.sendRecordToDLQ(records);
-            return false;
+    public async isValidMessageBody(body: any, target: ITarget) {
+        const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
+        if(config.validation) {
+            const enforcer = await Enforcer(`../resources/${target.swaggerSpecFile}`);
+            const schema = enforcer.components.schemas[target.schema];
+            const deserialised = schema.deserialize(body);
+            const output = schema.validate(deserialised.value);
+            if(output) {
+                console.log("Record failed validation: ", output);
+                return false
+            }
         }
         return true;
+    }
+
+    public isRetryableError(error: AWSError): boolean {
+        return !(error.statusCode >= 400 && error.statusCode < 429);
     };
 
-    private async sendRecordToDLQ(records: IStreamRecord[]) {
-        const target = getTargetFromSourceARN(records[0].eventSourceARN);
-        await this.sqs.sendMessage(JSON.stringify(records), target.dlQueue);
+    public async sendRecordToDLQ(event: IBody, target: ITarget) {
+        try {
+            await this.sqs.sendMessage(JSON.stringify(event), target.dlQueue);
+            return Promise.resolve();
+        } catch (e) {
+            console.log("Failed to send message to DLQ. ERROR: ", e, " and EVENT: ", event)
+            return Promise.reject()
+        }
     }
 }
 

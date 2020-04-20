@@ -12,6 +12,8 @@ export interface IBody {
 export interface ITarget {
   queue: string;
   dlQueue: string;
+  swaggerSpecFile: string;
+  schema: string;
   endpoints: {
     INSERT: string;
     MODIFY: string;
@@ -26,4 +28,6 @@ export interface ITargetConfig {
 export interface ISecretConfig {
   baseUrl: string;
   apiKey: string;
+  debugMode?: string | boolean;
+  validation?: string | boolean;
 }

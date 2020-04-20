@@ -16,6 +16,8 @@ targets:
   test-results:
     queue: test-results
     dlQueue: cvs-edh-dispatcher-test-results-${BRANCH}-dlq
+    swaggerSpecFile: API_Vehicle_Testresults_28.1.yaml
+    schemaItem: completeTestResults
     endpoints:
       INSERT: test-results
       MODIFY: test-results/{testResultId}

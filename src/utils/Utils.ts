@@ -3,7 +3,7 @@
  */
 import {Configuration} from "./Configuration";
 import {ERROR} from "../models/enums";
-import {ITarget, ITargetConfig} from "../models";
+import {ISecretConfig, ITarget, ITargetConfig} from "../models";
 
 export const getTargetFromSourceARN = (arn: string) => {
     // @ts-ignore
@@ -17,3 +17,10 @@ export const getTargetFromSourceARN = (arn: string) => {
     console.log("Valid targets: ", validTargets);
     return validTargets[0];
 };
+
+// export const debugOnlyLog = async (...args: any) => {
+//     const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
+//     if(config.debugMode) {
+//         console.log(...args);
+//     }
+// }

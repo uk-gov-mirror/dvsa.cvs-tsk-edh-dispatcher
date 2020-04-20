@@ -1,7 +1,8 @@
 import {DispatchService} from "../../src/services/DispatchService";
 import {ITarget} from "../../src/models";
 import {AWSError, DynamoDB} from "aws-sdk";
-import * as utils from "../../src/utils/Utils";
+import {ERROR} from "../../src/models/enums";
+import {Configuration} from "../../src/utils/Configuration";
 
 describe("Dispatch Service", () => {
   describe("processPath", () => {
@@ -104,41 +105,71 @@ describe("Dispatch Service", () => {
         deleteMessage: deleteMock,
       }
     });
-    const target: ITarget = {
-      queue: "",
-      dlQueue: "",
-      endpoints: {
-        INSERT: "Ipath",
-        MODIFY: "Mpath",
-        REMOVE: "Rpath",
-      }
-    };
+    const sendToDLQMock = jest.spyOn(DispatchService.prototype,"sendRecordToDLQ");
+    const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+      baseUrl: "",
+      apiKey: ""
+    }));
+    const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
     const body = {"test": {"S": "value"}};
     const svc = new DispatchService(new daoMock(), new sqsMock());
+
+    describe("with invalid event type & Bad ARN", () => {
+      const event = {
+        eventType: "NOT_A_THING",
+        body: {NewImage: {}}
+      };
+      const record = {
+        body: JSON.stringify(event),
+        eventSourceARN: "something-wrong"
+      };
+      it("invokes nothing, throws error", () => {
+        expect.assertions(5);
+        try {
+          svc.processEvent(record);
+        } catch (e) {
+          expect(putMock).not.toHaveBeenCalled();
+          expect(postMock).not.toHaveBeenCalled();
+          expect(deleteMock).not.toHaveBeenCalled();
+          expect(sendToDLQMock).not.toHaveBeenCalled();
+          expect(e.message).toEqual(ERROR.NO_UNIQUE_TARGET)
+        }
+      });
+    });
 
     describe("with invalid event type", () => {
       const event = {
         eventType: "NOT_A_THING",
         body: {NewImage: {}}
       };
-      it("invokes nothing, returns nothing", () => {
-        const output = svc.processEvent(event, target);
-        expect(output).toBeUndefined();
+      const record = {
+        body: JSON.stringify(event),
+        eventSourceARN: "something-test-results"
+      };
+      it("invokes sendRecordToDLQ", () => {
+        expect.assertions(4);
+        svc.processEvent(record);
         expect(putMock).not.toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalled();
         expect(deleteMock).not.toHaveBeenCalled();
+        expect(sendToDLQMock).toHaveBeenCalled();
       });
-
-
     });
+
     describe("with valid INSERT event type", () => {
       const event = {
         eventType: "INSERT",
-        body: {NewImage: body}
+        body: {
+          NewImage: body
+        }
       };
-      it("invokes the POST method with the right details", () => {
-        postMock.mockReturnValueOnce("posted");
-        const output = svc.processEvent(event, target);
+      const record = {
+        body: JSON.stringify(event),
+        eventSourceARN: "something-test-results"
+      };
+      it("invokes the POST method with the right details", async () => {
+        postMock.mockResolvedValue("posted");
+        const output = await svc.processEvent(record);
         expect(output).toEqual("posted");
         expect(putMock).not.toHaveBeenCalled();
         expect(postMock).toHaveBeenCalled();
@@ -150,15 +181,22 @@ describe("Dispatch Service", () => {
     describe("with valid MODIFY event type", () => {
       const event = {
         eventType: "MODIFY",
-        body: {NewImage: body}
+        body: {
+          Keys: {testResultId: {"S": "123"}},
+          NewImage: body
+        }
       };
-      it("invokes the PUT method with the right details", () => {
-        const output = svc.processEvent(event, target);
+      const record = {
+        body: JSON.stringify(event),
+        eventSourceARN: "something-test-results"
+      };
+      it("invokes the PUT method with the right details", async () => {
+        const output = await svc.processEvent(record);
         expect(output).toBeUndefined();
         expect(putMock).toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalled();
         expect(deleteMock).not.toHaveBeenCalled();
-        expect(putMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), target.endpoints.MODIFY)
+        expect(putMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), "test-results/123")
 
       });
     });
@@ -166,17 +204,23 @@ describe("Dispatch Service", () => {
     describe("with valid REMOVE event type", () => {
       const event = {
         eventType: "REMOVE",
-        body
+        body: {
+          Keys: {testResultId: {"S": "123"}}
+        }
       };
-      it("invokes the DELETE method with the right details", () => {
+      const record = {
+        body: JSON.stringify(event),
+        eventSourceARN: "something-test-results"
+      };
+      it("invokes the DELETE method with the right details", async () => {
         const svc = new DispatchService(new daoMock(), new sqsMock());
 
-        const output = svc.processEvent(event, target);
+        const output = await svc.processEvent(record);
         expect(output).toBeUndefined();
         expect(putMock).not.toHaveBeenCalled();
         expect(postMock).not.toHaveBeenCalled();
         expect(deleteMock).toHaveBeenCalled();
-        expect(deleteMock).toHaveBeenCalledWith(target.endpoints.REMOVE)
+        expect(deleteMock).toHaveBeenCalledWith("test-results/123")
       });
     });
   });
@@ -190,23 +234,28 @@ describe("Dispatch Service", () => {
     const svc = new DispatchService(new daoMock(), new sqsMock());
 
     describe("with  400-ish  error", ()  =>  {
-      it("returns false and sends message to DLQ", async  () => {
+      it("returns false", async  () => {
         const error = {statusCode: 404} as AWSError;
-        const sendRecordMock = jest.spyOn(DispatchService.prototype as any, "sendRecordToDLQ").mockResolvedValue("");
-        const output = await svc.isRetryableError(error, []);
+        const output = await svc.isRetryableError(error);
         expect(output).toBeFalsy();
-        expect(sendRecordMock).toHaveBeenCalled();
       });
     });
 
     describe("with  500-ish  error", ()  =>  {
-      it("returns false and doesn't send message", async  () => {
+      it("returns true", async  () => {
         const error = {statusCode: 500} as AWSError;
-        const sendRecordMock = jest.spyOn(DispatchService.prototype as any, "sendRecordToDLQ").mockResolvedValue("");
-        const output = await svc.isRetryableError(error, []);
+        const output = await svc.isRetryableError(error);
         expect(output).toBeTruthy();
-        expect(sendRecordMock).not.toHaveBeenCalled();
       });
     });
   });
+  // describe("isValidMessageBody", () => {
+  //   const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+  //     baseUrl: "",
+  //     apiKey: ""
+  //   }));
+  //   it("does something", () => {
+  //     expect(false).toBeTruthy();
+  //   })
+  // })
 });

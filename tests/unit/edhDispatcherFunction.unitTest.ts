@@ -40,57 +40,48 @@ describe("edhDispatcher function", () => {
       const processMock = jest.fn();
       jest.spyOn(DispatchService.prototype, "processEvent").mockImplementation(processMock);
       await edhDispatcher(event, ctx, () => {});
-      expect(processMock).toBeCalledWith(body, Configuration.getInstance().getTargets()["test-results"]);
+      expect(processMock).toBeCalledWith(event.Records[0]);
     });
-    describe("and Promise.all fails with error",  () => {
-      describe("error code is 400-ish", () => {
-        it("checks isRetryableError and does not throw error", async () => {
-          const body = {test: "value"};
-          const event = {
-            Records: [
-              {
-                body: JSON.stringify(body),
-                eventSourceARN: 'arn:aws:sqs:eu-west-1:006106226016:cvs-edh-dispatcher-test-results-cvsb-10773-queue'
-              }
-            ],
-          };
-          const error = {statusCode: 404} as AWSError;
-          const processMock = jest.fn().mockRejectedValue(error);
-          const retryableMock = jest.fn().mockResolvedValue(false);
-          jest.spyOn(DispatchService.prototype, "processEvent").mockImplementation(processMock);
-          jest.spyOn(DispatchService.prototype, "isRetryableError").mockImplementation(retryableMock);
-          expect.assertions(2);
+    describe("and ProcessEvent returns a rejection",  () => {
+      it("throws the error upwards", async () => {
+        const body = {test: "value"};
+        const event = {
+          Records: [
+            {
+              body: JSON.stringify(body),
+              eventSourceARN: 'arn:aws:sqs:eu-west-1:006106226016:cvs-edh-dispatcher-test-results-cvsb-10773-queue'
+            }
+          ],
+        };
+        const error = new Error("something bad");
+        const processMock = jest.spyOn(DispatchService.prototype, "processEvent").mockReturnValue(Promise.reject(error));
+        expect.assertions(2);
+        try {
           await edhDispatcher(event, ctx, () => {});
-          expect(processMock).toBeCalledWith(body, Configuration.getInstance().getTargets()["test-results"]);
-          expect(retryableMock).toBeCalledWith(error, event.Records);
-        });
-      })
-      describe("error code is 500-ish", () => {
-        it("checks isRetryableError and does throw error", async () => {
-          const body = {test: "value"};
-          const event = {
-            Records: [
-              {
-                body: JSON.stringify(body),
-                eventSourceARN: 'arn:aws:sqs:eu-west-1:006106226016:cvs-edh-dispatcher-test-results-cvsb-10773-queue'
-              }
-            ],
-          };
-          const error = {statusCode: 500} as AWSError;
-          const processMock = jest.fn().mockRejectedValue(error);
-          const retryableMock = jest.fn().mockResolvedValue(true);
-          jest.spyOn(DispatchService.prototype, "processEvent").mockImplementation(processMock);
-          jest.spyOn(DispatchService.prototype, "isRetryableError").mockImplementation(retryableMock);
-          expect.assertions(3);
-          try {
-            await edhDispatcher(event, ctx, () => {});
-          } catch (e) {
-            expect(processMock).toBeCalledWith(body, Configuration.getInstance().getTargets()["test-results"]);
-            expect(retryableMock).toBeCalledWith(error, event.Records);
-            expect(e).toEqual(error);
-          }
-        });
-      })
-    })
+        } catch (e) {
+          expect(e).toEqual(error);
+          expect(processMock).toBeCalledWith(event.Records[0]);
+        }
+      });
+    });
+    describe("and ProcessEvent returns a process resolve",  () => {
+      it("returns the resolution value", async () => {
+        const body = {test: "value"};
+        const event = {
+          Records: [
+            {
+              body: JSON.stringify(body),
+              eventSourceARN: 'arn:aws:sqs:eu-west-1:006106226016:cvs-edh-dispatcher-test-results-cvsb-10773-queue'
+            }
+          ],
+        };
+        const resp = "all good";
+        const processMock = jest.spyOn(DispatchService.prototype, "processEvent").mockReturnValue(Promise.resolve(resp));
+        expect.assertions(2);
+        const output = await edhDispatcher(event, ctx, () => {});
+        expect(output).toEqual([resp]);
+        expect(processMock).toBeCalledWith(event.Records[0]);
+      });
+    });
   });
 });
