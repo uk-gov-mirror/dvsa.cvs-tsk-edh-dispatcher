@@ -6,7 +6,6 @@ import {AWSError, DynamoDB} from "aws-sdk";
 import {SQService} from "./SQService";
 import {getTargetFromSourceARN} from "../utils/Utils";
 // tslint:disable-next-line
-const AWSXRay = require("aws-xray-sdk");
 const Enforcer = require("openapi-enforcer");
 
 
@@ -55,15 +54,15 @@ class DispatchService {
             try {
                 return await this.dao.postMessage(updateContent, path);
             } catch (e) {
-                console.log(e);
+                console.log("Failed to send request: ", e);
                 if (this.isRetryableError(e)) {
-                    return Promise.reject("Failed to send");
+                    return Promise.reject(ERROR.FAILED_TO_SEND);
                 } else {
                     this.sendRecordToDLQ(event, target);
                 }
             }
         } else {
-            console.log("Failed validation on event. Sending to DLQ");
+            console.log(ERROR.FAILED_VALIDATION_SENDING_TO_DLQ);
             this.sendRecordToDLQ(event, target);
         }
     }
@@ -75,15 +74,15 @@ class DispatchService {
             try {
                 return await this.dao.putMessage(updateContent, path);
             } catch (e) {
-                console.log(e);
+                console.log("Failed to send request: ", e);
                 if (this.isRetryableError(e)) {
-                    return Promise.reject("Failed to send");
+                    return Promise.reject(ERROR.FAILED_TO_SEND);
                 } else {
                     this.sendRecordToDLQ(event, target);
                 }
             }
         } else {
-            console.log("Failed validation on event. Sending to DLQ");
+            console.log(ERROR.FAILED_VALIDATION_SENDING_TO_DLQ);
             this.sendRecordToDLQ(event, target);
         }
     }
@@ -95,7 +94,7 @@ class DispatchService {
         } catch (e) {
             console.log("Failed to send request: ", e);
             if (this.isRetryableError(e)) {
-                return Promise.reject("Failed to send");
+                return Promise.reject(ERROR.FAILED_TO_SEND);
             } else {
                 this.sendRecordToDLQ(event, target);
             }
@@ -121,8 +120,8 @@ class DispatchService {
     public async isValidMessageBody(body: any, target: ITarget) {
         const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
         if(config.validation) {
-            const enforcer = await Enforcer(`../resources/${target.swaggerSpecFile}`);
-            const schema = enforcer.components.schemas[target.schema];
+            const enforcer = await Enforcer(`./src/resources/${target.swaggerSpecFile}`);
+            const schema = enforcer.components.schemas[target.schemaItem];
             const deserialised = schema.deserialize(body);
             const output = schema.validate(deserialised.value);
             if(output) {

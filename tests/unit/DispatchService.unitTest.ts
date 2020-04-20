@@ -93,7 +93,9 @@ describe("Dispatch Service", () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
-
+    afterAll(() => {
+      secretConfig.mockRestore();
+    });
     const putMock = jest.fn();
     const postMock = jest.fn();
     const deleteMock = jest.fn();
@@ -106,7 +108,7 @@ describe("Dispatch Service", () => {
       }
     });
     const sendToDLQMock = jest.spyOn(DispatchService.prototype,"sendRecordToDLQ");
-    const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+    const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: ""
     }));
@@ -224,14 +226,246 @@ describe("Dispatch Service", () => {
       });
     });
   });
-  describe("isRetryableError", ()  => {
-    beforeEach(()  => {
+  describe("sendPost method", () => {
+    afterEach(() => {
       jest.clearAllMocks();
     });
-
-    const daoMock = jest.fn();
+    afterAll(() => {
+      secretConfig.mockRestore();
+    });
+    const putMock = jest.fn();
+    const postMock = jest.fn();
+    const deleteMock = jest.fn();
     const sqsMock = jest.fn();
+    const daoMock = jest.fn().mockImplementation(() => {
+      return {
+        putMessage: putMock,
+        postMessage: postMock,
+        deleteMessage: deleteMock,
+      }
+    });
     const svc = new DispatchService(new daoMock(), new sqsMock());
+    const isValidMock = jest.spyOn(svc, "isValidMessageBody").mockResolvedValue(true);
+    const processPathMock = jest.spyOn(svc, "processPath").mockReturnValue("something");
+    const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
+    const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+      baseUrl: "",
+      apiKey: ""
+    }));
+    const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
+    const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
+    const body = {"test": {"S": "value"}};
+    const event = {
+      eventType: "NOT_A_THING",
+      body: {NewImage: body}
+    };
+    describe("with valid body", () => {
+      it("calls postMessage", async () => {
+        await (svc as any).sendPost(event, target);
+        expect(postMock).toHaveBeenCalled();
+        postMock.mockClear();
+      });
+      describe("and postMessage fails", () => {
+        it("calls isRetryableError method", async () => {
+          postMock.mockRejectedValue("nope");
+          try {
+            await (svc as any).sendPost(event, target);
+          } catch (e) {
+            expect(isRetryableErrorMock).toHaveBeenCalled();
+          }
+        });
+        describe("if it IS a retryable error", () => {
+          it("throws an error", async () => {
+            postMock.mockRejectedValue("nope");
+            try {
+              await (svc as any).sendPost(event, target);
+            } catch (e) {
+              expect(e).toEqual(ERROR.FAILED_TO_SEND);
+            }
+          })
+        });
+        describe("if it IS NOT a retryable error", () => {
+          it("sends the record to the DLQ", async () => {
+            isRetryableErrorMock.mockReturnValue(false);
+            postMock.mockRejectedValue("nope");
+            await (svc as any).sendPost(event, target);
+            expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+          })
+        })
+      })
+    });
+    describe("with an invalid body", () => {
+      it("sends the record to the DLQ", async () => {
+        isValidMock.mockResolvedValue(false);
+        await (svc as any).sendPost(event, target);
+        expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+      })
+    })
+  });
+  describe("sendPut method", () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    afterAll(() => {
+      secretConfig.mockRestore();
+    });
+    const putMock = jest.fn();
+    const postMock = jest.fn();
+    const deleteMock = jest.fn();
+    const sqsMock = jest.fn();
+    const daoMock = jest.fn().mockImplementation(() => {
+      return {
+        putMessage: putMock,
+        postMessage: postMock,
+        deleteMessage: deleteMock,
+      }
+    });
+    const svc = new DispatchService(new daoMock(), new sqsMock());
+    const isValidMock = jest.spyOn(svc, "isValidMessageBody").mockResolvedValue(true);
+    const processPathMock = jest.spyOn(svc, "processPath").mockReturnValue("something");
+    const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
+    const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+      baseUrl: "",
+      apiKey: ""
+    }));
+    const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
+    const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
+    const body = {"test": {"S": "value"}};
+    const event = {
+      eventType: "NOT_A_THING",
+      body: {NewImage: body}
+    };
+    describe("with valid body", () => {
+      it("calls putMessage", async () => {
+        await (svc as any).sendPut(event, target);
+        expect(putMock).toHaveBeenCalled();
+        putMock.mockClear();
+      });
+      describe("and putMessage fails", () => {
+        it("calls isRetryableError method", async () => {
+          putMock.mockRejectedValue("nope");
+          try {
+            await (svc as any).sendPut(event, target);
+          } catch (e) {
+            expect(isRetryableErrorMock).toHaveBeenCalled();
+          }
+        });
+        describe("if it IS a retryable error", () => {
+          it("throws an error", async () => {
+            putMock.mockRejectedValue("nope");
+            try {
+              await (svc as any).sendPut(event, target);
+            } catch (e) {
+              expect(e).toEqual(ERROR.FAILED_TO_SEND);
+            }
+          })
+        });
+        describe("if it IS NOT a retryable error", () => {
+          it("sends the record to the DLQ", async () => {
+            isRetryableErrorMock.mockReturnValue(false);
+            putMock.mockRejectedValue("nope");
+            await (svc as any).sendPut(event, target);
+            expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+          })
+        })
+      })
+    });
+    describe("with an invalid body", () => {
+      it("sends the record to the DLQ", async () => {
+        isValidMock.mockResolvedValue(false);
+        await (svc as any).sendPut(event, target);
+        expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+      })
+    })
+  });
+  describe("sendDelete method", () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+    afterAll(() => {
+      secretConfig.mockRestore();
+    });
+    const putMock = jest.fn();
+    const postMock = jest.fn();
+    const deleteMock = jest.fn();
+    const sqsMock = jest.fn();
+    const daoMock = jest.fn().mockImplementation(() => {
+      return {
+        putMessage: putMock,
+        postMessage: postMock,
+        deleteMessage: deleteMock,
+      }
+    });
+    const svc = new DispatchService(new daoMock(), new sqsMock());
+    const isValidMock = jest.spyOn(svc, "isValidMessageBody").mockResolvedValue(true);
+    const processPathMock = jest.spyOn(svc, "processPath").mockReturnValue("something");
+    const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
+    const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
+      baseUrl: "",
+      apiKey: ""
+    }));
+    const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
+    const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
+    const body = {"test": {"S": "value"}};
+    const event = {
+      eventType: "NOT_A_THING",
+      body: {NewImage: body}
+    };
+    describe("with valid body", () => {
+      it("calls postMessage", async () => {
+        await (svc as any).sendDelete(event, target);
+        expect(deleteMock).toHaveBeenCalled();
+        deleteMock.mockClear();
+      });
+      describe("and deleteMessage fails", () => {
+        it("calls isRetryableError method", async () => {
+          deleteMock.mockRejectedValue("nope");
+          try {
+            await (svc as any).sendDelete(event, target);
+          } catch (e) {
+            expect(isRetryableErrorMock).toHaveBeenCalled();
+          }
+        });
+        describe("if it IS a retryable error", () => {
+          it("throws an error", async () => {
+            deleteMock.mockRejectedValue("nope");
+            try {
+              await (svc as any).sendDelete(event, target);
+            } catch (e) {
+              expect(e).toEqual(ERROR.FAILED_TO_SEND);
+            }
+          })
+        });
+        describe("if it IS NOT a retryable error", () => {
+          it("sends the record to the DLQ", async () => {
+            isRetryableErrorMock.mockReturnValue(false);
+            deleteMock.mockRejectedValue("nope");
+            await (svc as any).sendDelete(event, target);
+            expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+          })
+        })
+      })
+    });
+    describe("with an invalid body", () => {
+      it("sends the record to the DLQ", async () => {
+        isValidMock.mockResolvedValue(false);
+        await (svc as any).sendDelete(event, target);
+        expect(sendToDLQMock).toHaveBeenCalledWith(event,target);
+      })
+    })
+  });
+  describe("isRetryableError", ()  => {
+    let svc: any;
+    beforeAll(()  => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+      const daoMock = jest.fn();
+      const sqsMock = jest.fn();
+      svc = new DispatchService(new daoMock(), new sqsMock());
+    });
+    afterAll(() => {
+      jest.restoreAllMocks();
+    });
 
     describe("with  400-ish  error", ()  =>  {
       it("returns false", async  () => {
@@ -249,13 +483,4 @@ describe("Dispatch Service", () => {
       });
     });
   });
-  // describe("isValidMessageBody", () => {
-  //   const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
-  //     baseUrl: "",
-  //     apiKey: ""
-  //   }));
-  //   it("does something", () => {
-  //     expect(false).toBeTruthy();
-  //   })
-  // })
 });

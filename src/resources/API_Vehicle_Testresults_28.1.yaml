@@ -6,7 +6,7 @@ info:
     once we have confirmed the security scheme we are using.
   version: 1.0.0
   title: Test Results Microservice
-  termsOfService: ''
+  termsOfService: 'http://test.com'
   contact:
     email: bpecete@deloittece.com
   license:
@@ -119,7 +119,7 @@ paths:
               - archived
               - all
           description: Query param to filter the test-results based on testVersion. If not present then GET will return the current test-result.
-                      Can be used only with testResultId query param, otherwise it is not taken into account.
+            Can be used only with testResultId query param, otherwise it is not taken into account.
       responses:
         '200':
           description: Test results returned
@@ -151,6 +151,7 @@ components:
         $ref: '#/components/schemas/completeTestResults'
     completeTestResults:
       type: object
+      additionalProperties: false
       properties:
         systemNumber:
           type: string
@@ -232,7 +233,10 @@ components:
           maxLength: 60
         testerStaffId:
           type: string
-          maxLength: 9
+          maxLength: 36
+        testResultId:
+          type: string
+          maxLength: 36
         testerEmailAddress:
           type: string
           maxLength: 60
@@ -249,7 +253,7 @@ components:
             - cancelled
         reasonForCancellation:
           type: string
-          maximum: 500
+          maxLength: 500
           nullable: true
           description: >-
             Required for Cancelled tests. Nullable only for Submitted and
@@ -343,6 +347,7 @@ components:
           type: string
         preparerName:
           type: string
+          nullable: true
         numberOfWheelsDriven:
           type: number
           maximum: 9999
@@ -422,7 +427,7 @@ components:
           description: 'Not sent from FE, calculated in the BE.'
         testCode:
           type: string
-          maximum: 3
+          maxLength: 4
           nullable: true
           description: 'Not sent from FE, calculated in the BE.'
         testTypeName:
@@ -447,12 +452,12 @@ components:
           description: 'Not sent from FE, calculated in the BE.'
         testExpiryDate:
           type: string
-          format: date
+          format: date-time
           nullable: true
           description: 'Sent form FE only for LEC tests. For the rest of the test types it is not sent from FE, and calculated in the BE.'
         testAnniversaryDate:
           type: string
-          format: date
+          format: date-time
           nullable: true
           description: 'Not sent from FE, calculated in the BE.'
         testTypeStartTimestamp:
@@ -494,11 +499,11 @@ components:
           description: Required for Abandoned tests.
         additionalNotesRecorded:
           type: string
-          maximum: 500
+          maxLength: 500
           nullable: true
         additionalCommentsForAbandon:
           type: string
-          maximum: 500
+          maxLength: 500
           nullable: true
         modType:
           type: object
@@ -516,7 +521,7 @@ components:
                 - modification or change of engine
                 - gas engine
           description: Used only for LEC tests. p = particulate trap, m = modification or change of engine, g = gas engine.
-
+          nullable: true
         emissionStandard:
           type: string
           enum:
@@ -528,6 +533,7 @@ components:
             - Euro VI
             - Full Electric
           description: Used only for LEC tests.
+          nullable: true
 
         fuelType:
           type: string
@@ -538,28 +544,33 @@ components:
             - gas-lpg
             - fuel cell
             - petrol
-            - full electric 
+            - full electric
           description: Used only for LEC tests.
+          nullable: true
 
         particulateTrapFitted:
           type: string
-          maximum: 100
+          maxLength: 100
           description: Used only for LEC tests.
+          nullable: true
 
         particulateTrapSerialNumber:
           type: string
-          maximum: 100
+          maxLength: 100
           description: Used only for LEC tests.
+          nullable: true
 
         modificationTypeUsed:
           type: string
-          maximum: 100
+          maxLength: 100
           description: Used only for LEC tests.
+          nullable: true
 
         smokeTestKLimitApplied:
           type: string
-          maximum: 100
+          maxLength: 100
           description: Used only for LEC tests.
+          nullable: true
 
         defects:
           $ref: '#/components/schemas/defects'
@@ -624,7 +635,7 @@ components:
                   maximum: 10
             notes:
               type: string
-              maximum: 500
+              maxLength: 500
               nullable: true
         itemNumber:
           type: number
@@ -674,16 +685,15 @@ components:
       properties:
         referenceNumber:
           type: string
-          maximum: 10
+          maxLength: 10
         defectName:
           type: string
-          maximum: 200
+          maxLength: 200
         defectNotes:
           type: string
-          maximum: 200
+          maxLength: 200
           nullable: true
 security:
-  - ApiKeyAuth: []
   - OAuth2:
       - read
       - write

@@ -13,7 +13,7 @@ export interface ITarget {
   queue: string;
   dlQueue: string;
   swaggerSpecFile: string;
-  schema: string;
+  schemaItem: string;
   endpoints: {
     INSERT: string;
     MODIFY: string;
