@@ -58,12 +58,12 @@ class DispatchService {
                 if (this.isRetryableError(e)) {
                     return Promise.reject(ERROR.FAILED_TO_SEND);
                 } else {
-                    this.sendRecordToDLQ(event, target);
+                    return this.sendRecordToDLQ(event, target);
                 }
             }
         } else {
             console.log(ERROR.FAILED_VALIDATION_SENDING_TO_DLQ);
-            this.sendRecordToDLQ(event, target);
+            return this.sendRecordToDLQ(event, target);
         }
     }
 
@@ -78,12 +78,12 @@ class DispatchService {
                 if (this.isRetryableError(e)) {
                     return Promise.reject(ERROR.FAILED_TO_SEND);
                 } else {
-                    this.sendRecordToDLQ(event, target);
+                    return this.sendRecordToDLQ(event, target);
                 }
             }
         } else {
             console.log(ERROR.FAILED_VALIDATION_SENDING_TO_DLQ);
-            this.sendRecordToDLQ(event, target);
+            return this.sendRecordToDLQ(event, target);
         }
     }
 
@@ -96,7 +96,7 @@ class DispatchService {
             if (this.isRetryableError(e)) {
                 return Promise.reject(ERROR.FAILED_TO_SEND);
             } else {
-                this.sendRecordToDLQ(event, target);
+                return this.sendRecordToDLQ(event, target);
             }
         }
     }
