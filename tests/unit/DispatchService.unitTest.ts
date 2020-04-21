@@ -247,7 +247,7 @@ describe("Dispatch Service", () => {
     const svc = new DispatchService(new daoMock(), new sqsMock());
     const isValidMock = jest.spyOn(svc, "isValidMessageBody").mockResolvedValue(true);
     const processPathMock = jest.spyOn(svc, "processPath").mockReturnValue("something");
-    const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
+    const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ").mockResolvedValue(Promise.resolve());
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: ""
