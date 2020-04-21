@@ -1,6 +1,7 @@
 {
   "name": "cvs-tsk-edh-dispatcher",
   "version": "0.0.1",
+  "engines" : { "node" : ">8.10" },
   "description": "Receives DynamoDB Streams destined for EDH and parcels them out to their respective SQS queues",
   "main": "handler.js",
   "scripts": {
