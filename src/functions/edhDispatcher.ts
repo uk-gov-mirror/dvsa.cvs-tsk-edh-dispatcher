@@ -41,7 +41,7 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
         sentMessagePromises.push(call);
     });
 
-    let promises = Promise.all(sentMessagePromises);
+    let promises = await Promise.all(sentMessagePromises);
     console.log("Response: ", promises);
     return promises
 };
