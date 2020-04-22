@@ -1,0 +1,306 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is the API spec for the activity microservice. The purpose of this
+    microservice is to capture activities done by the user within the scope of
+    this application, such as site visits.
+  version: 1.0.0
+  title: Activity Microservice
+  termsOfService: ''
+  contact:
+    email: glazu@deloittece.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: startActivity
+    description: Endpoint used to initiate an activity.
+    externalDocs:
+      description: Find out more
+      url: 'https://wiki.i-env.net/display/HVT/Epic%3A+Complete+a+site+visit'
+  - name: endActivity
+    description: Endpoints used to end an activity by a given ID.
+    externalDocs:
+      description: Find out more
+      url: 'https://wiki.i-env.net/display/HVT/Epic%3A+Complete+a+site+visit'
+paths:
+  /activities:
+    post:
+      summary: Create a new activity.
+      tags:
+        - startActivity
+      requestBody:
+        description: POST the new activity.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/POSTActivity'
+      responses:
+        '201':
+          description: Activity created
+          headers:
+            location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/POSTResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: User is not authenticated
+        '403':
+          description: User already has an activity ongoing.
+  '/activities/{id}/end':
+    put:
+      summary: End an activity based on the specified activity id.
+      tags:
+        - endActivity
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Activity ID
+      responses:
+        '204':
+          description: Activity updated
+        '400':
+          description: Invalid input
+        '401':
+          description: User is not authenticated
+        '404':
+          description: Activity does not exist
+  /activities/update:
+    put:
+      summary: Update an activity based on the specified activity id.
+      tags:
+        - updateActivity
+      requestBody:
+        description: Update the new activity.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PUTActivity'
+      responses:
+        '204':
+          description: Activity updated
+        '400':
+          description: Invalid input
+        '401':
+          description: User is not authenticated
+        '404':
+          description: 'Activity with {id} does not exist'
+  /activities/details:
+    get:
+      summary: >-
+        Get activities based on activity details passed as querry parameters.
+        The system will return maximum the last 10 activities order descendent
+        by the startTime of the activity.
+      tags:
+        - getActivities
+      parameters:
+        - in: query
+          name: activityType
+          schema:
+            type: string
+            enum:
+              - visit
+              - wait
+        - in: query
+          name: fromStartTime
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            The returned id should be for an activity with the startDate greater
+            or equal to the value provided in the querry parameter
+          required: true
+        - in: query
+          name: toStartTime
+          schema:
+            type: string
+            format: date-time
+          description: >-
+            The returned id should be for an activity with the startDate lower
+            or equal to the value provided in the querry parameter
+        - in: query
+          name: testStationPNumber
+          schema:
+            type: string
+          description: The test station PNumber sent as a parameter.
+        - in: query
+          name: testerStaffId
+          schema:
+            type: string
+          description: The tester staff ID sent as a parameter.
+      responses:
+        '200':
+          description: Activity details returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GETResponse'
+        '401':
+          description: Not authenticated
+        '403':
+          description: Unauthorised Access
+        '404':
+          description: Operation not supported
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+  schemas:
+    POSTActivity:
+      type: object
+      required:
+        - activityType
+        - testStationName
+        - testStationPNumber
+        - testStationEmail
+        - testStationType
+        - testerName
+        - testerStaffId
+      properties:
+        parentId:
+          type: string
+          nullable: true
+        activityType:
+          type: string
+          enum:
+            - visit
+            - wait
+            - unaccountable time
+        testStationName:
+          type: string
+        testStationPNumber:
+          type: string
+        testStationEmail:
+          type: string
+        testStationType:
+          type: string
+          enum:
+            - atf
+            - gvts
+            - hq
+        testerName:
+          type: string
+        testerStaffId:
+          type: string
+        testerEmail:
+          type: string
+          format: email
+          description: Required if the activity type is "visit"
+        startTime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Required if the activity type is "wait" or "unaccountable time".
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Required if the activity type is "wait" or "unaccountable time".
+        waitReason:
+          type: array
+          items:
+            type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    PUTActivity:
+      type: array
+      items:
+        $ref: '#/components/schemas/updateActivity'
+    updateActivity:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: number
+        waitReason:
+          type: array
+          items:
+            type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    POSTResponse:
+      type: object
+      properties:
+        id:
+          type: number
+    GETResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/activity'
+    activity:
+      type: object
+      properties:
+        id:
+          type: number
+        parentId:
+          type: string
+          nullable: true
+        activityType:
+          type: string
+          enum:
+            - visit
+            - wait
+            - unaccountable time
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+        testStationName:
+          type: string
+        testStationPNumber:
+          type: string
+        testStationEmail:
+          type: string
+        testStationType:
+          type: string
+          enum:
+            - atf
+            - gvts
+            - hq
+        testerName:
+          type: string
+        testerStaffId:
+          type: string
+        testerEmail:
+          type: string
+          format: email
+          description: Required if the activity type is "visit"
+        waitReason:
+          type: array
+          items:
+            type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+security:
+  - OAuth2:
+      - read
+      - write
+servers:
+  - url: 'https://url/api/v1'

@@ -8,7 +8,7 @@ info:
   title: Test Results Microservice
   termsOfService: 'http://test.com'
   contact:
-    email: bpecete@deloittece.com
+    email: test@test.com
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'

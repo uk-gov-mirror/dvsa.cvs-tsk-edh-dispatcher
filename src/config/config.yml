@@ -25,6 +25,8 @@ targets:
   activities:
     queue: activities
     dlQueue: cvs-edh-dispatcher-activities-${BRANCH}-dlq
+    swaggerSpecFile: API_Activities_04.yaml
+    schemaItem: activity
     endpoints:
       INSERT: activities
       MODIFY: activities/{id}
