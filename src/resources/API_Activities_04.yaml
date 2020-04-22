@@ -251,6 +251,7 @@ components:
         $ref: '#/components/schemas/activity'
     activity:
       type: object
+      additionalProperties: false
       properties:
         id:
           type: number
