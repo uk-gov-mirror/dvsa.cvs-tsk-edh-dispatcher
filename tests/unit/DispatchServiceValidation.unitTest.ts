@@ -1,7 +1,7 @@
 import {ITarget} from "../../src/models";
 import {Configuration} from "../../src/utils/Configuration";
 import {DispatchService} from "../../src/services/DispatchService";
-import * as testResult from "../resources/demoTestResult.json";
+import testResult from "../resources/demoTestResult.json";
 
 describe("isValidMessageBody", () => {
   beforeAll(() => {
@@ -42,11 +42,11 @@ describe("isValidMessageBody", () => {
       expect(secretMock).toHaveBeenCalled();
       expect(output).toEqual(false);
     });
-    // it("returns true when evaluating a 'good' record against a valid spec", async () => {
-    //   const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
-    //   const output = await svc.isValidMessageBody(testResult, target);
-    //   expect(output).toEqual(true);
-    // });
+    it("returns true when evaluating a 'good' record against a valid spec", async () => {
+      const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
+      const output = await svc.isValidMessageBody(testResult, target);
+      expect(output).toEqual(true);
+    });
   });
   describe("when validation = false", () => {
     afterEach(() => {
