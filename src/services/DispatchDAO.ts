@@ -62,6 +62,7 @@ export class DispatchDAO {
         host: this.config.host,
         AWSTraceHeader: process.env._X_AMZN_TRACE_ID
       },
+      resolveWithFullResponse: true,
       body: JSON.stringify(body)
     };
   };
