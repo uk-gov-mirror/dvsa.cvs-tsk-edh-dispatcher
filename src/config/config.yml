@@ -25,7 +25,7 @@ targets:
   activities:
     queue: activities
     dlQueue: cvs-edh-dispatcher-activities-${BRANCH}-dlq
-    swaggerSpecFile: API_Activities_04.yaml
+    swaggerSpecFile: API_Activities_05.yaml
     schemaItem: activity
     endpoints:
       INSERT: activities
@@ -34,8 +34,8 @@ targets:
   technical-records:
     queue: technical-records
     dlQueue: cvs-edh-dispatcher-technical-records-${BRANCH}-dlq
-    swaggerSpecFile: API_Vehicle_Tech_Records_v30.yaml
-    schemaItem: completeTechRecord
+    swaggerSpecFile: API_Vehicle_Tech_Records_v31.yaml
+    schemaItem: completeTechRecordDB
     endpoints:
       INSERT: vehicles/{systemNumber}
       MODIFY: vehicles/{systemNumber}
