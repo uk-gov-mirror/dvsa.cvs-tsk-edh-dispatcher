@@ -37,6 +37,6 @@ targets:
     swaggerSpecFile: API_Vehicle_Tech_Records_v30.yaml
     schemaItem: completeTechRecord
     endpoints:
-      INSERT: activities
-      MODIFY: activities/{id}
-      REMOVE: activities/{id}
+      INSERT: vehicles/{systemNumber}
+      MODIFY: vehicles/{systemNumber}
+      REMOVE: vehicles/{systemNumber}
