@@ -32,6 +32,7 @@ describe("isValidMessageBody", () => {
       secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
         baseUrl: "",
         apiKey: "",
+        host: "",
         validation: "true"
       }));
     });
@@ -57,6 +58,7 @@ describe("isValidMessageBody", () => {
       const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
         baseUrl: "",
         apiKey: "",
+        host: "",
         validation: false
       }));
       const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
@@ -72,13 +74,13 @@ describe("isValidMessageBody", () => {
     it("always returns true", async () => {
       const secretMock = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
         baseUrl: "",
-        apiKey: ""
+        apiKey: "",
+        host: ""
       }));
       const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
       const output = await svc.isValidMessageBody({something: "invalid"}, target);
       expect(output).toEqual(true);
       secretMock.mockRestore();
     });
-  })
-
-})
+  });
+});

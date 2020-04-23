@@ -72,3 +72,18 @@ In order to test, you need to run the following:
 ### Environmental variables
 
 - The `BRANCH` environment variable indicates in which environment is this application running. Not setting this variable will result in defaulting to `local`.
+
+### Secrets and Feature Flags
+The Secrets Configs should be structured as:
+```
+{
+   baseUrl: string;
+   apiKey: string;
+   host: string;
+   debugMode?: string | boolean;
+   validation?: string | boolean;
+}
+```
+baseUrl, apiKey and host all go into the details for API calls.
+Schema Validation is currently locked behind the validation feature flag. Any value other than missing or empty is assumed to be true.
+debugMode is currently unused, but intended to act as a feature flag for the debugOnlyLog logging util function. 

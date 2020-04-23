@@ -110,7 +110,8 @@ describe("Dispatch Service", () => {
     const sendToDLQMock = jest.spyOn(DispatchService.prototype,"sendRecordToDLQ");
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
-      apiKey: ""
+      apiKey: "",
+      host: ""
     }));
     const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
     const body = {"test": {"S": "value"}};
@@ -250,7 +251,8 @@ describe("Dispatch Service", () => {
     const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ").mockResolvedValue(Promise.resolve());
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
-      apiKey: ""
+      apiKey: "",
+      host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
     const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
@@ -326,7 +328,8 @@ describe("Dispatch Service", () => {
     const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
-      apiKey: ""
+      apiKey: "",
+      host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
     const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
@@ -402,7 +405,8 @@ describe("Dispatch Service", () => {
     const sendToDLQMock = jest.spyOn(svc,"sendRecordToDLQ");
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
-      apiKey: ""
+      apiKey: "",
+      host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
     const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
