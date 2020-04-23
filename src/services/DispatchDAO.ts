@@ -16,7 +16,7 @@ export class DispatchDAO {
    * @param body - the payload to send
    * @param path - the path extension beyond the base
    */
-  public async putMessage(body: any, path: string, ) {
+  public async putMessage(body: any, path: string ) {
     if (!this.config) {
       this.config = await Configuration.getInstance().getSecretConfig();
     }
