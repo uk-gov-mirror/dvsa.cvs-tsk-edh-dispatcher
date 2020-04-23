@@ -31,3 +31,12 @@ targets:
       INSERT: activities
       MODIFY: activities/{id}
       REMOVE: activities/{id}
+  technical-records:
+    queue: technical-records
+    dlQueue: cvs-edh-dispatcher-technical-records-${BRANCH}-dlq
+    swaggerSpecFile: API_Vehicle_Tech_Records_v30.yaml
+    schemaItem: completeTechRecord
+    endpoints:
+      INSERT: activities
+      MODIFY: activities/{id}
+      REMOVE: activities/{id}
