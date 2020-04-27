@@ -19,7 +19,7 @@ targets:
     swaggerSpecFile: API_Vehicle_Testresults_28.1.yaml
     schemaItem: completeTestResults
     endpoints:
-      INSERT: test-results
+      INSERT: test-results/{testResultId}
       MODIFY: test-results/{testResultId}
       REMOVE: test-results/{testResultId}
   activities:
@@ -28,7 +28,7 @@ targets:
     swaggerSpecFile: API_Activities_05.yaml
     schemaItem: activity
     endpoints:
-      INSERT: activities
+      INSERT: activities/{id}
       MODIFY: activities/{id}
       REMOVE: activities/{id}
   technical-records:

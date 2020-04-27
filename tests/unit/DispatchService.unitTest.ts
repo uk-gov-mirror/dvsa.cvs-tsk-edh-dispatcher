@@ -163,6 +163,7 @@ describe("Dispatch Service", () => {
       const event = {
         eventType: "INSERT",
         body: {
+          Keys: {testResultId: {"S": "123"}},
           NewImage: body
         }
       };
@@ -177,7 +178,7 @@ describe("Dispatch Service", () => {
         expect(putMock).not.toHaveBeenCalled();
         expect(postMock).toHaveBeenCalled();
         expect(deleteMock).not.toHaveBeenCalled();
-        expect(postMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), target.endpoints.INSERT)
+        expect(postMock).toHaveBeenCalledWith(DynamoDB.Converter.unmarshall(body), "test-results/123")
       });
     });
 
