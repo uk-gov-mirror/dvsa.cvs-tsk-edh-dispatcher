@@ -4,8 +4,7 @@ import {DispatchService} from "../services/DispatchService";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {SendMessageResult} from "aws-sdk/clients/sqs";
 import {GetRecordsOutput} from "aws-sdk/clients/dynamodbstreams";
-import {getTargetFromSourceARN} from "../utils/Utils";
-import {IBody, IStreamRecord} from "../models";
+import {IStreamRecord} from "../models";
 import {DispatchDAO} from "../services/DispatchDAO";
 import requestPromise from "request-promise";
 import {SQService} from "../services/SQService";
@@ -36,7 +35,7 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
 
     records.forEach((record: IStreamRecord) => {
         console.log("Record: ", record);
-        const call = dispatchService.processEvent(record) as Promise<any>;
+        const call = dispatchService.processEvent(record);
         console.log("Output: ", call);
         sentMessagePromises.push(call);
     });

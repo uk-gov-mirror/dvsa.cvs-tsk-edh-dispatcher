@@ -115,7 +115,7 @@ class DispatchService {
         }
         console.log("Processed path: ", path);
         return path;
-    };
+    }
 
     public async isValidMessageBody(body: any, target: ITarget) {
         const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
@@ -134,7 +134,7 @@ class DispatchService {
 
     public isRetryableError(error: AWSError): boolean {
         return !(error.statusCode >= 400 && error.statusCode < 429);
-    };
+    }
 
     public async sendRecordToDLQ(event: IBody, target: ITarget) {
         try {
