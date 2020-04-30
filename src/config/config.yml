@@ -16,7 +16,7 @@ targets:
   test-results:
     queue: test-results
     dlQueue: cvs-edh-dispatcher-test-results-${BRANCH}-dlq
-    swaggerSpecFile: API_Vehicle_Testresults_28.1.yaml
+    swaggerSpecFile: API_Vehicle_Test_Results_CVS->EDH_v1.yaml
     schemaItem: completeTestResults
     endpoints:
       INSERT: test-results/{testResultId}
@@ -25,7 +25,7 @@ targets:
   activities:
     queue: activities
     dlQueue: cvs-edh-dispatcher-activities-${BRANCH}-dlq
-    swaggerSpecFile: API_Activities_05.yaml
+    swaggerSpecFile: API_Activities_CVS->EDH_v1.yaml
     schemaItem: activity
     endpoints:
       INSERT: activities/{id}
@@ -34,7 +34,7 @@ targets:
   technical-records:
     queue: technical-records
     dlQueue: cvs-edh-dispatcher-technical-records-${BRANCH}-dlq
-    swaggerSpecFile: API_Vehicle_Tech_Records_v31.yaml
+    swaggerSpecFile: API_Vehicle_Tech_Records_CVS->EDH_v1.yaml
     schemaItem: completeTechRecordDB
     endpoints:
       INSERT: vehicles/{systemNumber}

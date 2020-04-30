@@ -1,27 +1,17 @@
 openapi: 3.0.0
 info:
   description: >-
-    This is the API spec for capturing test results. These test result will be
-    stored in the AWS DynamoDB database. Authorization details will be updated
-    once we have confirmed the security scheme we are using.
+    This is the API spec for the integration between EDH and CVS for synchronising Test Results records.
   version: 1.0.0
-  title: Test Results Microservice
+  title: Test Results CVS->EDH integration
   termsOfService: 'http://test.com'
   contact:
-    email: test@test.com
+    email: akothiyal@deloitte.co.uk
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-tags:
-  - name: Test results
-    description: >-
-      Endpoint to retrieve  information about a test records. Other attributes
-      may be added in the future like the test certificate
-    externalDocs:
-      description: Find out more
-      url: 'https://wiki.i-env.net/display/HVT/Epic%3A+Capture+test+results'
 paths:
-  /test-results:
+  '/test-results/{systemNumber}':
     post:
       summary: Submitting a new test records
       requestBody:
@@ -31,16 +21,27 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/completeTestResults'
+      parameters:
+        - in: path
+          name: systemNumber
+          schema:
+            type: string
+          required: true
       responses:
-        '201':
-          description: Test records created
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
         '401':
           description: Not authenticated
         '403':
           description: Unauthorised Access
         '404':
           description: Operation not supported
-  '/test-results/{systemNumber}':
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
     put:
       summary: 'Update a test result, for a particular system number'
       tags:
@@ -59,80 +60,44 @@ paths:
             schema:
               $ref: '#/components/schemas/completeTestResults'
       responses:
-        '200':
-          description: The updated test-result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/testResults'
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
         '401':
           description: Not authenticated
         '403':
           description: Unauthorised Access
         '404':
           description: Operation not supported
-    get:
-      summary: 'Get a test results, for a particular Vin with status specified.'
-      tags:
-        - getTestResults
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete the identified Test Result - will probably never be used.
       parameters:
         - in: path
           name: systemNumber
           schema:
             type: string
           required: true
-        - in: query
-          name: status
-          schema:
-            type: string
-            default: submitted
-            enum:
-              - submitted
-              - cancelled
-          description: The test result status
-        - in: query
-          name: fromDateTime
-          schema:
-            type: string
-            format: date-time
-          description: >-
-            The UTC ISO Date Time filter, if the fromDate and ToDate not
-            specified by default to 2 years of data for now.
-        - in: query
-          name: toDateTime
-          schema:
-            type: string
-            format: date-time
-          description: The UTC ISO DateTime filter.
-        - in: query
-          name: testResultId
-          schema:
-            type: string
-          description: Query param to filter the test-results based on testResultId.
-        - in: query
-          name: version
-          schema:
-            type: string
-            default: current
-            enum:
-              - current
-              - archived
-              - all
-          description: Query param to filter the test-results based on testVersion. If not present then GET will return the current test-result.
-            Can be used only with testResultId query param, otherwise it is not taken into account.
+          description: Unique Identifier for a vehicle record
       responses:
-        '200':
-          description: Test results returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/testResults'
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
         '401':
-          description: Not authenticated
+          description: Unauthorized
         '403':
-          description: Unauthorised Access
+          description: Forbidden
         '404':
-          description: Operation not supported
+          description: Operation Not Supported
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
 components:
   securitySchemes:
     OAuth2:
@@ -145,10 +110,6 @@ components:
             read: Grants read access
             write: Grants write access
   schemas:
-    testResults:
-      type: array
-      items:
-        $ref: '#/components/schemas/completeTestResults'
     completeTestResults:
       type: object
       additionalProperties: false

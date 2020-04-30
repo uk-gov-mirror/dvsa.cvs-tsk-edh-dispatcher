@@ -12,7 +12,7 @@ describe("isValidMessageBody", () => {
   const target: ITarget = {
     queue: "",
     dlQueue: "",
-    swaggerSpecFile: "API_Vehicle_Testresults_28.1.yaml",
+    swaggerSpecFile: "API_Vehicle_Test_Results_CVS->EDH_v1.yaml",
     schemaItem: "completeTestResults",
     endpoints: {
       INSERT: "",
