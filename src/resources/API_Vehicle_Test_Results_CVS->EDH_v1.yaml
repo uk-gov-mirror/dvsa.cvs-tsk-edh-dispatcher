@@ -143,7 +143,7 @@ components:
         testHistory:
           type: array
           items:
-            $ref: '#/components/schemas/completeTestResults'
+            $ref: '#/components/schemas/historicalTestResults'
           nullable: true
           description: Array of archived test-results. The test-results in this array won't have the testHistory attribute and testVersion will always be archived. Should not be sent when performing an update
         testVersion:
@@ -152,6 +152,249 @@ components:
           description: Tests submitted from the mobile app won't have this attribute. Tests updated/created by VTM will do.
           enum:
             - current
+            - archived
+        reasonForCreation:
+          type: string
+          nullable: true
+          description: 'Applicable only when updating/creating a test from VTM'
+        createdAt:
+          type: string
+          format: date-time
+          description: 'Not sent from FE, calculated in the BE.'
+        createdByName:
+          type: string
+          description: 'Applicable only when updating/creating a test from VTM'
+        createdById:
+          type: string
+          description: 'Applicable only when updating/creating a test from VTM'
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: 'Not sent from FE, calculated in the BE.'
+        lastUpdatedByName:
+          type: string
+          description: 'Applicable only when updating/creating a test from VTM'
+        lastUpdatedById:
+          type: string
+          description: 'Applicable only when updating/creating a test from VTM'
+        testStationName:
+          type: string
+          maxLength: 999
+        testStationPNumber:
+          type: string
+          maxLength: 20
+        testStationType:
+          type: string
+          enum:
+            - atf
+            - gvts
+            - hq
+        testerName:
+          type: string
+          maxLength: 60
+        testerStaffId:
+          type: string
+          maxLength: 36
+        testResultId:
+          type: string
+          maxLength: 36
+        testerEmailAddress:
+          type: string
+          maxLength: 60
+        testStartTimestamp:
+          type: string
+          format: date-time
+        testEndTimestamp:
+          type: string
+          format: date-time
+        testStatus:
+          type: string
+          enum:
+            - submitted
+            - cancelled
+        reasonForCancellation:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: >-
+            Required for Cancelled tests. Nullable only for Submitted and
+            Abandoned tests.
+        vehicleClass:
+          type: object
+          nullable: true
+          properties:
+            code:
+              type: string
+              nullable: true
+              enum:
+                - '2'
+                - 'n'
+                - 's'
+                - '1'
+                - 't'
+                - 'l'
+                - '3'
+                - 'v'
+                - '4'
+                - '7'
+                - '5'
+                - 'p'
+                - 'u'
+            description:
+              type: string
+              nullable: true
+              enum:
+                - 'motorbikes over 200cc or with a sidecar'
+                - 'not applicable'
+                - 'small psv (ie: less than or equal to 22 seats)'
+                - 'motorbikes up to 200cc'
+                - 'trailer'
+                - 'large psv(ie: greater than 23 seats)'
+                - '3 wheelers'
+                - 'heavy goods vehicle'
+                - 'MOT class 4'
+                - 'MOT class 7'
+                - 'MOT class 5'
+                - 'PSV of unknown or unspecified size'
+                - 'Not Known'
+          description: Mandatory only for motorcycles. 2 = MotorBikes over 200cc or with a sidecar, N = Not Applicable, S =
+            Small PSV i.e less than or equal to 22 seats, 1 = Motorbikes upto
+            200cc, T = Trailer, L = LARGE PSV (ie. greater than 23 seats), 3 =
+            3 wheelers, V = Heavy Goods Vehicle
+        vehicleSubclass:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Used for car and lgv.
+        vehicleType:
+          type: string
+          enum:
+            - psv
+            - hgv
+            - trl
+            - car
+            - lgv
+            - motorcycle
+        numberOfSeats:
+          type: number
+          description: mandatory for PSV only, not applicable for HGV and TRL
+        vehicleConfiguration:
+          type: string
+          enum:
+            - rigid
+            - articulated
+            - centre axle drawbar
+            - semi-car transporter
+            - semi-trailer
+            - low loader
+            - other
+            - drawbar
+            - four-in-line
+            - dolly
+            - full drawbar
+        odometerReading:
+          type: number
+          nullable: true
+          description: Nullable only for Cancelled tests & not applicable to TRL
+        odometerReadingUnits:
+          type: string
+          enum:
+            - kilometres
+            - miles
+          nullable: true
+          description: Nullable only for Cancelled tests & not applicable to TRL
+        preparerId:
+          type: string
+        preparerName:
+          type: string
+          nullable: true
+        numberOfWheelsDriven:
+          type: number
+          maximum: 9999
+          nullable: true
+        euVehicleCategory:
+          type: string
+          enum:
+            - m1
+            - m2
+            - m3
+            - n1
+            - n2
+            - n3
+            - o1
+            - o2
+            - o3
+            - o4
+            - l1e-a
+            - l1e
+            - l2e
+            - l3e
+            - l4e
+            - l5e
+            - l6e
+            - l7e
+          nullable: true
+          description: Nullable only for Cancelled tests.
+        countryOfRegistration:
+          type: string
+          nullable: true
+          description: Nullable only for Cancelled tests.
+        vehicleSize:
+          type: string
+          enum:
+            - large
+            - small
+          description: Mandatory for PSV only & not applicable to HGV and TRL
+        noOfAxles:
+          type: number
+          maximum: 99
+        regnDate:
+          type: string
+          format: date
+          description: Used only for PSV and HGV
+          nullable: true
+        firstUseDate:
+          type: string
+          format: date
+          description: Used only for TRL
+          nullable: true
+        testTypes:
+          $ref: '#/components/schemas/testTypes'
+    historicalTestResults:
+      type: object
+      additionalProperties: false
+      properties:
+        systemNumber:
+          type: string
+          description: It defines the link between a test and the vehicle, by uniqeuly identifing the vehicle.
+        vrm:
+          type: string
+          minLength: 1
+          maxLength: 8
+          description: Mandatory for PSV and HGV, not applicable to TRL
+        trailerId:
+          type: string
+          description: Mandatory for TRL, not applicable to PSV and HGV
+        vin:
+          type: string
+          minLength: 1
+          maxLength: 21
+        vehicleId:
+          type: string
+          nullable: true
+          description: >-
+            Not sent from FE, calculated in the BE. When the test result is
+            submitted, in BE, the VRM of the vehicle will be copied into
+            vehicleId also.
+        deletionFlag:
+          type: boolean
+          nullable: true
+          description: 'Not sent from FE, calculated in the BE.'
+        testVersion:
+          type: string
+          description: Tests submitted from the mobile app won't have this attribute. Tests updated/created by VTM will do.
+          enum:
             - archived
         reasonForCreation:
           type: string
