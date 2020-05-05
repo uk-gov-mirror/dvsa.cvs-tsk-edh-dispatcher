@@ -1,4 +1,4 @@
-service: cvs-svc-activities
+service: cvs-tsk-edh-dispatcher
 
 provider:
   name: aws

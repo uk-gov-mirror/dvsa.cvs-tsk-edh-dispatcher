@@ -60,7 +60,8 @@ export class DispatchDAO {
       headers: {
         "x-api-key": this.config.apiKey,
         host: this.config.host,
-        AWSTraceHeader: process.env._X_AMZN_TRACE_ID
+        AWSTraceHeader: process.env._X_AMZN_TRACE_ID,
+        "X-Amzn-Trace-Id": process.env._X_AMZN_TRACE_ID
       },
       resolveWithFullResponse: true,
       body: JSON.stringify(body)
