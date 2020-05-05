@@ -17,10 +17,7 @@ export class DispatchDAO {
    * @param path - the path extension beyond the base
    */
   public async putMessage(body: any, path: string ) {
-    if (!this.config) {
-      this.config = await Configuration.getInstance().getSecretConfig();
-    }
-    const messageParams = this.getMessageParams("PUT", path, body);
+    const messageParams = await this.getMessageParams("PUT", path, body);
     console.log("message parameters: ", messageParams);
     return this.request.put(messageParams);
   }
@@ -31,10 +28,7 @@ export class DispatchDAO {
    * @param path - the path extension beyond the base
    */
   public async postMessage(body: any, path: string ) {
-    if (!this.config) {
-      this.config = await Configuration.getInstance().getSecretConfig();
-    }
-    const messageParams = this.getMessageParams("POST", path, body);
+    const messageParams = await this.getMessageParams("POST", path, body);
     console.log("message parameters: ", messageParams);
     return this.request.post(messageParams);
   }
@@ -45,20 +39,20 @@ export class DispatchDAO {
    * @param path - the path extension beyond the base
    */
   public async deleteMessage(path: string ) {
-    if (!this.config) {
-      this.config = await Configuration.getInstance().getSecretConfig();
-    }
-    const messageParams = this.getMessageParams("DELETE", path);
+    const messageParams = await this.getMessageParams("DELETE", path);
     console.log("message parameters: ", messageParams);
     return this.request.delete(messageParams);
   }
 
-  private getMessageParams = (method: string, path: string, body?: any) => {
+  private getMessageParams = async (method: string, path: string, body?: any) => {
+    if (!this.config) {
+      this.config = await Configuration.getInstance().getSecretConfig();
+    }
     return {
       method,
-      uri: `${this.config.baseUrl}/${path}`,
+      uri: `${process.env.EDH === "STUB" ? this.config.stubBaseUrl : this.config.baseUrl}/${path}`,
       headers: {
-        "x-api-key": this.config.apiKey,
+        "x-api-key": process.env.EDH === "STUB" ? this.config.stubApiKey : this.config.apiKey,
         host: this.config.host,
         AWSTraceHeader: process.env._X_AMZN_TRACE_ID,
         "X-Amzn-Trace-Id": process.env._X_AMZN_TRACE_ID

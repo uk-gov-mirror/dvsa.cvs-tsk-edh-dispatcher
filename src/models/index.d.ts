@@ -28,6 +28,8 @@ export interface ITargetConfig {
 export interface ISecretConfig {
   baseUrl: string;
   apiKey: string;
+  stubBaseUrl: string;
+  stubApiKey: string;
   host: string;
   debugMode?: string | boolean;
   validation?: string | boolean;
