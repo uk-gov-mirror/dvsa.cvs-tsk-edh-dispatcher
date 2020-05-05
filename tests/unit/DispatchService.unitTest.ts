@@ -111,6 +111,8 @@ describe("Dispatch Service", () => {
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: "",
+      stubBaseUrl: "",
+      stubApiKey: "",
       host: ""
     }));
     const target: ITarget = Configuration.getInstance().getTargets()["test-results"];
@@ -253,6 +255,8 @@ describe("Dispatch Service", () => {
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: "",
+      stubBaseUrl: "",
+      stubApiKey: "",
       host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
@@ -330,6 +334,8 @@ describe("Dispatch Service", () => {
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: "",
+      stubBaseUrl: "",
+      stubApiKey: "",
       host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
@@ -407,6 +413,8 @@ describe("Dispatch Service", () => {
     const secretConfig = jest.spyOn(Configuration.prototype, "getSecretConfig").mockResolvedValue(Promise.resolve({
       baseUrl: "",
       apiKey: "",
+      stubBaseUrl: "",
+      stubApiKey: "",
       host: ""
     }));
     const isRetryableErrorMock = jest.spyOn(DispatchService.prototype, "isRetryableError").mockReturnValue(true);
