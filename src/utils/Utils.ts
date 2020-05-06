@@ -19,8 +19,7 @@ export const getTargetFromSourceARN = (arn: string) => {
 };
 
 // export const debugOnlyLog = async (...args: any) => {
-//     const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
-//     if(config.debugMode) {
+//     if(process.env.DEBUG === "TRUE") {
 //         console.log(...args);
 //     }
 // }

@@ -72,18 +72,22 @@ In order to test, you need to run the following:
 ### Environmental variables
 
 - The `BRANCH` environment variable indicates in which environment is this application running. Not setting this variable will result in defaulting to `local`.
-
+- the `EDH` environment variable is used as a feature flag, to switch to stub endpoints. 
+    A value of of `STUB` will use the stubApiKey and stubBaseUrl.
+    Any other value will use the real key/url  
+ 
 ### Secrets and Feature Flags
 The Secrets Configs should be structured as:
 ```
 {
    baseUrl: string;
    apiKey: string;
-   host: string;
+   stubBaseUrl: string;
+   stubApiKey: string;
    debugMode?: string | boolean;
    validation?: string | boolean;
 }
 ```
-baseUrl, apiKey and host all go into the details for API calls.
+baseUrl, stubBseURL, apiKey, and stubApiKey all go into the details for API calls.
 Schema Validation is currently locked behind the validation feature flag. Any value other than missing or empty is assumed to be true.
 debugMode is currently unused, but intended to act as a feature flag for the debugOnlyLog logging util function. 

@@ -53,7 +53,6 @@ export class DispatchDAO {
       uri: `${process.env.EDH === "STUB" ? this.config.stubBaseUrl : this.config.baseUrl}/${path}`,
       headers: {
         "x-api-key": process.env.EDH === "STUB" ? this.config.stubApiKey : this.config.apiKey,
-        host: this.config.host,
         AWSTraceHeader: process.env._X_AMZN_TRACE_ID,
         "X-Amzn-Trace-Id": process.env._X_AMZN_TRACE_ID
       },

@@ -42,7 +42,6 @@ describe("DispatchDAO", () => {
       expect(putMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(putMock.mock.calls[0][0].body).toEqual("{}");
       expect(putMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
-      expect(putMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);
     })
   });
   describe("postMessage", () => {
@@ -55,7 +54,7 @@ describe("DispatchDAO", () => {
       expect(postMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(postMock.mock.calls[0][0].body).toEqual("{}");
       expect(postMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
-      expect(postMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);    })
+    })
   });
   describe("deleteMessage", () => {
     it("invokes promise.delete with correct message", async () => {
@@ -67,7 +66,7 @@ describe("DispatchDAO", () => {
       expect(deleteMock.mock.calls[0][0].uri).toEqual("http://myEndpoint.com/something");
       expect(deleteMock.mock.calls[0][0].body).toBeUndefined();
       expect(deleteMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.apiKey);
-      expect(deleteMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);    })
+    })
   });
   describe("with stub flag = true", () => {
     beforeAll(() => {
@@ -83,7 +82,6 @@ describe("DispatchDAO", () => {
         expect(putMock.mock.calls[0][0].uri).toEqual("http://myStubEndpoint.com/something");
         expect(putMock.mock.calls[0][0].body).toEqual("{}");
         expect(putMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.stubApiKey);
-        expect(putMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);
       })
     });
     describe("postMessage", () => {
@@ -96,7 +94,6 @@ describe("DispatchDAO", () => {
         expect(postMock.mock.calls[0][0].uri).toEqual("http://myStubEndpoint.com/something");
         expect(postMock.mock.calls[0][0].body).toEqual("{}");
         expect(postMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.stubApiKey);
-        expect(postMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);
       })
     });
     describe("deleteMessage", () => {
@@ -109,7 +106,7 @@ describe("DispatchDAO", () => {
         expect(deleteMock.mock.calls[0][0].uri).toEqual("http://myStubEndpoint.com/something");
         expect(deleteMock.mock.calls[0][0].body).toBeUndefined();
         expect(deleteMock.mock.calls[0][0].headers["x-api-key"]).toEqual(secrets.stubApiKey);
-        expect(deleteMock.mock.calls[0][0].headers["host"]).toEqual(secrets.host);    })
+      })
     });
   })
 });

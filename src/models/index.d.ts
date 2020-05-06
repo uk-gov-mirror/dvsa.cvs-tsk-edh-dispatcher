@@ -30,7 +30,6 @@ export interface ISecretConfig {
   apiKey: string;
   stubBaseUrl: string;
   stubApiKey: string;
-  host: string;
   debugMode?: string | boolean;
   validation?: string | boolean;
 }

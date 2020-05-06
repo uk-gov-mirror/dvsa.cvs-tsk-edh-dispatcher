@@ -36,7 +36,6 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
     records.forEach((record: IStreamRecord) => {
         console.log("Record: ", record);
         const call = dispatchService.processEvent(record);
-        console.log("Output: ", call);
         sentMessagePromises.push(call);
     });
 
