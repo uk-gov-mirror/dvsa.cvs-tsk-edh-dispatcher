@@ -40,6 +40,8 @@ class SQService {
      * @param queueName - The queue name
      */
     public async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
+        console.log(`Sending message to ${queueName}: `, messageBody);
+
         // Get the queue URL for the provided queue name
         const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
         .promise();
