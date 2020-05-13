@@ -118,8 +118,7 @@ class DispatchService {
     }
 
     public async isValidMessageBody(body: any, target: ITarget) {
-        const config: ISecretConfig = await Configuration.getInstance().getSecretConfig();
-        if(config.validation) {
+        if(process.env.VALIDATION === "TRUE") {
             const enforcer = await Enforcer(`./src/resources/${target.swaggerSpecFile}`);
             const schema = enforcer.components.schemas[target.schemaItem];
             const deserialised = schema.deserialize(body);

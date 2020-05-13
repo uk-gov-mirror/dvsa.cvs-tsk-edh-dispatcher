@@ -5,7 +5,6 @@ takes EDH updates from queues and sends them to the appropriate EDH endpoints
 - NodeJS 8.10
 - Typescript - `npm install -g typescript`
 - Serverless - `npm install -g serverless`
-- Docker
 
 ### Installing
 - Install dependencies - `npm install`
@@ -13,31 +12,11 @@ takes EDH updates from queues and sends them to the appropriate EDH endpoints
 ### Building
 - Building without source maps - `npm run build`
 - Building with source maps - `npm run build:dev`
-- Building the docker containers - `npm run build:docker`
-
-### Running
-- The app can be started by running `npm run start:docker`.
 
 ### Configuration
 The configuration file can be found under `src/config/config.yml`.
 Environment variable injection is possible with the syntax:
 `${BRANCH}`, or you can specify a default value: `${BRANCH:local}`.
-
-#### SQS
-SQS contains configuration for the local environment or the AWS environment. Locally, you need to provide the `localhost` region and the SQS endpoint, which in this case is the address of a docker image. `apiVersion` and `queueName` need to be provided for both environments.
-```
-sqs:
-  local:
-    params:
-      region: localhost
-      endpoint: http://sqs:9324
-      apiVersion: "2012-11-05"
-    queueName: cert-gen-q
-  remote:
-    params:
-      apiVersion: "2012-11-05"
-    queueName: cert-gen-q
-```
 
 ### Git Hooks
 
@@ -72,9 +51,11 @@ In order to test, you need to run the following:
 ### Environmental variables
 
 - The `BRANCH` environment variable indicates in which environment is this application running. Not setting this variable will result in defaulting to `local`.
-- the `EDH` environment variable is used as a feature flag, to switch to stub endpoints. 
+- The `EDH` environment variable is used as a feature flag, to switch to stub endpoints. 
     A value of of `STUB` will use the stubApiKey and stubBaseUrl.
     Any other value will use the real key/url  
+- The `DEBUG` environment variable is used as a feature flag, to enable more extensive logging. Does more logging if value is `TRUE`, otherwise off
+- The `VALIDATION` environment variable is used as a feature flag, to enable validation. Does validation if value is `TRUE`, otherwise off
  
 ### Secrets and Feature Flags
 The Secrets Configs should be structured as:
@@ -84,10 +65,6 @@ The Secrets Configs should be structured as:
    apiKey: string;
    stubBaseUrl: string;
    stubApiKey: string;
-   debugMode?: string | boolean;
-   validation?: string | boolean;
 }
 ```
 baseUrl, stubBseURL, apiKey, and stubApiKey all go into the details for API calls.
-Schema Validation is currently locked behind the validation feature flag. Any value other than missing or empty is assumed to be true.
-debugMode is currently unused, but intended to act as a feature flag for the debugOnlyLog logging util function. 
