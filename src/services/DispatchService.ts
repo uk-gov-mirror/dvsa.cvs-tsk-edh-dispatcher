@@ -16,7 +16,7 @@ class DispatchService {
     private readonly config: any;
     private dao: DispatchDAO;
     private sqs: SQService;
-
+    private basePath: string = "./resources/"
     /**
      * Constructor for the ActivityService class
      * @param sqsClient - The Simple Queue Service client
@@ -119,7 +119,7 @@ class DispatchService {
 
     public async isValidMessageBody(body: any, target: ITarget) {
         if(process.env.VALIDATION === "TRUE") {
-            const enforcer = await Enforcer(`./src/resources/${target.swaggerSpecFile}`);
+            const enforcer = await Enforcer(`${this.basePath}${target.swaggerSpecFile}`);
             const schema = enforcer.components.schemas[target.schemaItem];
             const deserialised = schema.deserialize(body);
             const output = schema.validate(deserialised.value);
