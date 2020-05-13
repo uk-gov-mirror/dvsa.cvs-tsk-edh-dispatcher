@@ -3,7 +3,7 @@
  */
 import {Configuration} from "./Configuration";
 import {ERROR} from "../models/enums";
-import {ISecretConfig, ITarget, ITargetConfig} from "../models";
+import {ITarget, ITargetConfig} from "../models";
 
 export const getTargetFromSourceARN = (arn: string) => {
     // @ts-ignore
