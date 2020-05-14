@@ -1,5 +1,6 @@
 import {RequestPromiseAPI} from "request-promise";
 import {Configuration} from "../utils/Configuration";
+import {debugOnlyLog} from "../utils/Utils";
 
 export class DispatchDAO {
   private config: any;
@@ -18,7 +19,7 @@ export class DispatchDAO {
    */
   public async putMessage(body: any, path: string ) {
     const messageParams = await this.getMessageParams("PUT", path, body);
-    console.log("message parameters: ", messageParams);
+    debugOnlyLog("message parameters: ", messageParams);
     return this.request.put(messageParams);
   }
 
@@ -29,7 +30,7 @@ export class DispatchDAO {
    */
   public async postMessage(body: any, path: string ) {
     const messageParams = await this.getMessageParams("POST", path, body);
-    console.log("message parameters: ", messageParams);
+    debugOnlyLog("message parameters: ", messageParams);
     return this.request.post(messageParams);
   }
 
@@ -40,7 +41,7 @@ export class DispatchDAO {
    */
   public async deleteMessage(path: string ) {
     const messageParams = await this.getMessageParams("DELETE", path);
-    console.log("message parameters: ", messageParams);
+    debugOnlyLog("message parameters: ", messageParams);
     return this.request.delete(messageParams);
   }
 

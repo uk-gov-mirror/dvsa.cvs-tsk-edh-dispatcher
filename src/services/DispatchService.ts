@@ -4,7 +4,7 @@ import {IBody, ISecretConfig, IStreamRecord, ITarget} from "../models";
 import {DispatchDAO} from "./DispatchDAO";
 import {AWSError, DynamoDB} from "aws-sdk";
 import {SQService} from "./SQService";
-import {getTargetFromSourceARN} from "../utils/Utils";
+import {debugOnlyLog, getTargetFromSourceARN} from "../utils/Utils";
 // tslint:disable-next-line
 const Enforcer = require("openapi-enforcer");
 
@@ -30,7 +30,7 @@ class DispatchService {
     public processEvent(record: IStreamRecord) {
         const target: ITarget = getTargetFromSourceARN(record.eventSourceARN);
         const eventPayload: IBody = JSON.parse(record.body);
-        console.log("eventPayload: ", eventPayload);
+        debugOnlyLog("eventPayload: ", eventPayload);
 
         const eventType = eventPayload.eventType; //INSERT, MODIFY or REMOVE
 
@@ -104,7 +104,7 @@ class DispatchService {
     public processPath(path: string, body: any) {
         const replaceRegex: RegExp = /{(\w+\b):?(\w+\b)?}/g;
         const matches: RegExpMatchArray | null = path.match(replaceRegex);
-        console.log("Keys", body.Keys);
+        debugOnlyLog("Keys", body.Keys);
         if (matches) {
             matches.forEach((match: string) => {
                 const matchString = match.substring(1, match.length - 1);
@@ -113,7 +113,7 @@ class DispatchService {
                 path = path.replace(match, replVal);
             });
         }
-        console.log("Processed path: ", path);
+        debugOnlyLog("Processed path: ", path);
         return path;
     }
 

@@ -3,6 +3,7 @@ import {Configuration} from "../utils/Configuration";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {AWSError, config as AWSConfig} from "aws-sdk";
 import {ERROR} from "../models/enums";
+import {debugOnlyLog} from "../utils/Utils";
 // tslint:disable-next-line
 const AWSXRay = require("aws-xray-sdk");
 
@@ -40,7 +41,7 @@ class SQService {
      * @param queueName - The queue name
      */
     public async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
-        console.log(`Sending message to ${queueName}: `, messageBody);
+        debugOnlyLog(`Sending message to ${queueName}: `, messageBody);
 
         // Get the queue URL for the provided queue name
         const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })

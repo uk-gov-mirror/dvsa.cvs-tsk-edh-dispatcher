@@ -8,6 +8,7 @@ import {IStreamRecord} from "../models";
 import {DispatchDAO} from "../services/DispatchDAO";
 import requestPromise from "request-promise";
 import {SQService} from "../services/SQService";
+import {debugOnlyLog} from "../utils/Utils";
 
 /**
  * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
@@ -20,7 +21,7 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
         console.error("ERROR: event is not defined.");
         return;
     }
-    console.log("Event: ", event);
+    debugOnlyLog("Event: ", event);
 
     const records = event.Records as IStreamRecord[];
     if (!records || !records.length) {
@@ -31,16 +32,16 @@ const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context
     // Instantiate the Simple Queue Service
     const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise), new SQService(new SQS()));
     const sentMessagePromises: Array<Promise<any>> = [];
-    console.log("Records: ", records);
+    debugOnlyLog("Records: ", records);
 
     records.forEach((record: IStreamRecord) => {
-        console.log("Record: ", record);
+        debugOnlyLog("Record: ", record);
         const call = dispatchService.processEvent(record);
         sentMessagePromises.push(call);
     });
 
     let promises = await Promise.all(sentMessagePromises);
-    console.log("Response: ", promises);
+    debugOnlyLog("Response: ", promises);
     return promises
 };
 
