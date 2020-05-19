@@ -1,0 +1,1456 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is the API spec for the integration between EDH and CVS for synchronising Vehicle records.
+  version: 1.0.0
+  title: Vehicles CVS->EDH integration
+  termsOfService: ''
+  contact:
+    email: akothiyal@deloitte.co.uk
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /vehicles/{systemNumber}:
+    post:
+      summary: Create a new Tech Record.
+      requestBody:
+        description: POST the new Tech Record.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/completeTechRecordDB'
+      parameters:
+        - in: path
+          name: systemNumber
+          schema:
+            type: string
+          required: true
+          description: Unique Identifier for a vehicle record
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Operation Not Supported
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update an Tech Record.
+      requestBody:
+        description: PUT the changed Tech Record.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/completeTechRecordDB'
+      parameters:
+        - in: path
+          name: systemNumber
+          schema:
+            type: string
+          required: true
+          description: Unique Identifier for a vehicle record
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Operation Not Supported
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete the identified Tech Record - will probably never be used.
+      parameters:
+        - in: path
+          name: systemNumber
+          schema:
+            type: string
+          required: true
+          description: Unique Identifier for a vehicle record
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Operation Not Supported
+        '429':
+          description: Too Many Requests
+        '500':
+          description: Internal Server Error
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+  schemas:
+    techRecords:
+      type: array
+      items:
+        $ref: '#/components/schemas/techRecord'
+    techRecord:
+      type: object
+      properties:
+        recordCompleteness:
+          type: string
+          description: Defines the level of completeness for a tech record. If it is set to "skeleton" then it means the vehicle does not meet the minimum requirements to be tested. If it is "testable" it means the vehicle meets the minimum requirements to be tested but is not complete from a business perspective. If "complete" then the vehicle it is complete form a business perspective also.
+        createdAt:
+          type: string
+          format: date-time
+          description: 'Used for all vehicle types'
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: 'Used for all vehicle types'
+        make:
+          type: string
+          maxLength: 30
+          description: Used only for HGV and TRL
+        model:
+          type: string
+          maxLength: 30
+          description: Used only for HGV and TRL
+        functionCode:
+          type: string
+          maxLength: 1
+          description: Used for all vehicle types
+          nullable: true
+        fuelPropulsionSystem:
+          type: string
+          description: Used for HGV and PSV
+          enum:
+            - DieselPetrol
+            - Hybrid
+            - Electric
+            - CNG
+            - Fuel cell
+            - LNG
+            - Other
+        offRoad:
+          type: boolean
+          description: Used only for HGV
+        numberOfWheelsDriven:
+          type: number
+          maximum: 9999
+          description: Used for motorcycles to derive the test codes for specialist tests. Used for HGV and PSV.
+        euVehicleCategory:
+          type: string
+          description: Used for HGV and PSV. Optional for car, lgv and motorcycle.
+          enum:
+            - m1
+            - m2
+            - m3
+            - n1
+            - n2
+            - n3
+            - o1
+            - o2
+            - o3
+            - o4
+            - l1e-a
+            - l1e
+            - l2e
+            - l3e
+            - l4e
+            - l5e
+            - l6e
+            - l7e
+        emissionsLimit:
+          type: number
+          description: Used only for HGV and PSV
+          maximum: 99
+          nullable: true
+        departmentalVehicleMarker:
+          type: boolean
+          nullable: true
+          description: Used for all vehicle types
+        authIntoService:
+          $ref: '#/components/schemas/authIntoService'
+        lettersOfAuth:
+          $ref: '#/components/schemas/lettersOfAuth'
+        alterationMarker:
+          type: boolean
+          nullable: true
+          description: Used for all vehicle types
+        approvalType:
+          type: string
+          description: Used for all vehicle types
+          enum:
+            - NTA
+            - ECTA
+            - IVA
+            - NSSTA
+            - ECSSTA
+        approvalTypeNumber:
+          description: Used for all vehicle types
+          type: string
+          maxLength: 25
+          nullable: true
+        variantNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+          description: Used for all vehicle types
+        variantVersionNumber:
+          type: string
+          maxLength: 35
+          nullable: true
+          description: Used for all vehicle types
+        grossEecWeight:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV and TRL
+        trainEecWeight:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV
+        maxTrainEecWeight:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV
+        applicantDetails:
+          $ref: '#/components/schemas/applicantDetailsProperties'
+        purchaserDetails:
+          $ref: '#/components/schemas/purchaserDetails'
+        manufacturerDetails:
+          $ref: '#/components/schemas/manufacturerDetails'
+        microfilm:
+          $ref: '#/components/schemas/microfilm'
+        plates:
+          $ref: '#/components/schemas/plates'
+        chassisMake:
+          type: string
+          maxLength: 20
+          description: Used only for PSV
+        chassisModel:
+          type: string
+          maxLength: 20
+          description: Used only for PSV
+        bodyMake:
+          type: string
+          maxLength: 20
+          description: Used only for PSV
+        bodyModel:
+          type: string
+          maxLength: 20
+          description: Used only for PSV
+        modelLiteral:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: Used only for PSV
+        bodyType:
+          type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - a
+                - s
+                - d
+                - o
+                - m
+                - x
+                - p
+                - k
+                - t
+                - b
+                - f
+                - r
+                - c
+            description:
+              type: string
+              enum:
+                - articulated
+                - single decker
+                - double decker
+                - other
+                - petrol/oil tanker
+                - skeletal
+                - tipper
+                - box
+                - flat
+                - refuse
+                - skip loader
+                - refrigerated
+          description: >-
+            Used for all vehicle types - PSV, HGV and TRL. o = other, a =
+            articulated, m = other, s = single decker, d = double decker, x =
+            other, p = petrol/oil tanker, k = skeletal, t = tipper, b = box, f =
+            flat, r = refuse, s = skip loader (for HGV and TRL), c = refrigerated
+        manufactureYear:
+          type: number
+          maximum: 9999
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+        regnDate:
+          type: string
+          format: date
+          nullable: true
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+        firstUseDate:
+          type: string
+          format: date
+          nullable: true
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        coifDate:
+          type: string
+          format: date
+          description: Used only for PSV
+          nullable: true
+        ntaNumber:
+          type: string
+          maxLength: 40
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+          nullable: true
+        coifSerialNumber:
+          description: Used only for PSV
+          type: string
+          maxLength: 8
+          nullable: true
+        coifCertifierName:
+          description: Used only for PSV
+          type: string
+          maxLength: 20
+          nullable: true
+        conversionRefNo:
+          type: string
+          maxLength: 10
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+          nullable: true
+        seatsLowerDeck:
+          type: number
+          maximum: 999
+          description: Used only for PSV
+        seatsUpperDeck:
+          type: number
+          maximum: 99
+          description: Used only for PSV
+        standingCapacity:
+          type: number
+          maximum: 999
+          description: Used only for PSV
+        speedRestriction:
+          type: number
+          maximum: 99
+          description: Used only for PSV
+          nullable: true
+        speedLimiterMrk:
+          type: boolean
+          description: Used only for PSV and HGV
+        tachoExemptMrk:
+          type: boolean
+          description: Used only for PSV and HGV
+        dispensations:
+          type: string
+          maxLength: 160
+          nullable: true
+          description: Used only for PSV
+        remarks:
+          type: string
+          maxLength: 1024
+          nullable: true
+          description: Used for PSV, car, lgv and motorcycle
+        reasonForCreation:
+          type: string
+          maxLength: 100
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv and motorcycle'
+        statusCode:
+          type: string
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+          enum:
+            - archived
+            - current
+            - provisional
+        unladenWeight:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        grossKerbWeight:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        grossLadenWeight:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        grossGbWeight:
+          type: number
+          maximum: 99999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        grossDesignWeight:
+          type: number
+          maximum: 99999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        trainGbWeight:
+          type: number
+          maximum: 99999
+          description: Used only for HGV
+        trainDesignWeight:
+          type: number
+          maximum: 99999
+          description: Used only for HGV and PSV
+          nullable: true
+        maxTrainGbWeight:
+          type: number
+          maximum: 99999
+          description: Used only for HGV and PSV. Optional for PSV
+        maxTrainDesignWeight:
+          type: number
+          maximum: 99999
+          description: Used only for HGV
+          nullable: true
+        maxLoadOnCoupling:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+          nullable: true
+        frameDescription:
+          type: string
+          nullable: true
+          enum:
+            - Channel section
+            - Space frame
+            - I section
+            - Tubular
+            - Frame section
+            - Other
+            - integral
+            - Box section
+            - U section
+        tyreUseCode:
+          type: string
+          maxLength: 2
+          description: Used only for HGV and TRL
+          nullable: true
+        roadFriendly:
+          type: boolean
+          description: Used only for HGV and TRL
+        drawbarCouplingFitted:
+          type: boolean
+          description: Used only for HGV
+        euroStandard:
+          type: string
+          description: Used for HGV and PSV
+        suspensionType:
+          type: string
+          maxLength: 1
+          description: Used only for TRL
+          nullable: true
+        couplingType:
+          type: string
+          maxLength: 1
+          description: Used only for TRL
+          nullable: true
+        dimensions:
+          type: object
+          properties:
+            length:
+              type: number
+              maximum: 99999
+              description: Used for all vehicle types. Optional for PSV
+            height:
+              type: number
+              maximum: 99999
+              description: Used only for PSV
+              nullable: true
+            width:
+              type: number
+              maximum: 99999
+              description: Used for all vehicle types. Optional for PSV
+            axleSpacing:
+              type: array
+              description: Used only for HGV and TRL
+              items:
+                type: object
+                properties:
+                  axles:
+                    type: string
+                    nullable: true
+                  value:
+                    type: number
+                    maximum: 99999
+                    description: Optional for HGV
+        frontAxleTo5thWheelMin:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV
+        frontAxleTo5thWheelMax:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV
+        frontAxleTo5thWheelCouplingMin:
+          type: number
+          maximum: 99999
+          description: Used only for HGV. Optional for HGV
+        frontAxleTo5thWheelCouplingMax:
+          type: number
+          maximum: 99999
+          description: Used only for HGV. Optional for HGV
+        frontAxleToRearAxle:
+          type: number
+          maximum: 99999
+          description: Used for all vehicle types. Optional for PSV
+        rearAxleToRearTrl:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        couplingCenterToRearAxleMin:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        couplingCenterToRearAxleMax:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        couplingCenterToRearTrlMin:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        couplingCenterToRearTrlMax:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        centreOfRearmostAxleToRearOfTrl:
+          type: number
+          maximum: 99999
+          description: Used only for TRL
+        notes:
+          type: string
+          description: Used only for HGV and TRL
+          nullable: true
+        noOfAxles:
+          type: number
+          maximum: 99
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+        brakeCode:
+          type: string
+          maxLength: 6
+          description: Used only for PSV
+        adrDetails:
+          $ref: '#/components/schemas/adrDetails'
+        createdByName:
+          type: string
+          nullable: true
+          description: >-
+            This field gets populated with the Microsoft AD 'name', when a tech record gets created
+        createdById:
+          type: string
+          nullable: true
+          description: >-
+            This attribute gets populated with the Microsoft AD 'oid', when a tech record gets created
+        lastUpdatedByName:
+          type: string
+          description: >-
+            This field gets populated with the Microsoft AD 'name', when a tech record gets updated
+        lastUpdatedById:
+          type: string
+          description: >-
+            This attribute gets populated with the Microsoft AD 'oid', when a tech record gets updated
+        updateType:
+          type: string
+          enum:
+            - adrUpdate
+            - techRecordUpdate
+          description: >-
+            set updateType to adrUpdate on the archived tech record, when a tech record is archived
+        vehicleClass:
+          type: object
+          properties:
+            code:
+              type: string
+              nullable: true
+              enum:
+                - '2'
+                - 'n'
+                - 's'
+                - '1'
+                - 't'
+                - 'l'
+                - '3'
+                - 'v'
+                - '4'
+                - '7'
+                - '5'
+            description:
+              type: string
+              enum:
+                - 'motorbikes over 200cc or with a sidecar'
+                - 'not applicable'
+                - 'small psv (ie: less than or equal to 22 seats)'
+                - 'motorbikes up to 200cc'
+                - 'trailer'
+                - 'large psv(ie: greater than 23 seats)'
+                - '3 wheelers'
+                - 'heavy goods vehicle'
+                - 'MOT class 4'
+                - 'MOT class 7'
+                - 'MOT class 5'
+                - 'PSV of unknown or unspecified size'
+                - 'Not Known'
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle. Mandatory only for motorcycle.'
+        vehicleSubclass:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Used for car and lgv.
+        vehicleType:
+          type: string
+          enum:
+            - psv
+            - hgv
+            - trl
+            - car
+            - lgv
+            - motorcycle
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+        vehicleSize:
+          type: string
+          enum:
+            - small
+            - large
+          description: Used only for PSV
+        numberOfSeatbelts:
+          type: string
+          maxLength: 99
+          description: Used only for PSV
+        seatbeltInstallationApprovalDate:
+          type: string
+          nullable: true
+          description: Used only for PSV
+        vehicleConfiguration:
+          type: string
+          enum:
+            - rigid
+            - articulated
+            - centre axle drawbar
+            - semi-car transporter
+            - semi-trailer
+            - low loader
+            - other
+            - drawbar
+            - four-in-line
+            - dolly
+            - full drawbar
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        brakes:
+          $ref: '#/components/schemas/brakes'
+        axles:
+          $ref: '#/components/schemas/axles'
+        dda:
+          $ref: '#/components/schemas/dda'
+    adrDetails:
+      type: object
+      nullable: true
+      description: Used only for HGV and TRL
+      properties:
+        vehicleDetails:
+          type: object
+          properties:
+            type:
+              type: string
+              description: >-
+                Mandatory. Users must select ONE of these. Users cannot select
+                less/more
+            approvalDate:
+              type: string
+              description: Date (YYYY-MM-DD)
+              format: date
+        listStatementApplicable:
+          type: boolean
+          description: >-
+            Optional. Applicable only if vehicleDetails.type contains the word ‘battery’.
+        batteryListNumber:
+          type: string
+          maxLength: 8
+          description: >-
+            Mandatory if listStatementApplicable is true, therefore applicable only if vehicleDetails.type contains the word ‘battery’. Else N/A
+        declarationsSeen:
+          type: boolean
+          nullable: true
+          description: Optional for all vehicle types
+        brakeDeclarationsSeen:
+          type: boolean
+          nullable: true
+          description: Optional for all vehicle types
+        brakeDeclarationIssuer:
+          type: string
+          nullable: true
+          description: Optional for all vehicle types
+        brakeEndurance:
+          type: boolean
+          nullable: true
+          description: Optional for all vehicle types
+        weight:
+          type: string
+          maxLength: 8
+          description: >-
+            Mandatory if brakeEndurance = true, else N/A
+        compatibilityGroupJ:
+          type: boolean
+          nullable: true
+          description: Optional for all vehicle types
+        documents:
+          type: array
+          items:
+            type: string
+          description: >-
+            Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+        permittedDangerousGoods:
+          type: array
+          description: >-
+            Mandatory. Users must select, AT LEAST ONE of these. However, users
+            CAN select more than one
+          items:
+            type: string
+        additionalExaminerNotes:
+          type: string
+          maxLength: 1024
+          description: Optional for all vehicle types
+          nullable: true
+        applicantDetails:
+          type: object
+          properties:
+            name:
+              type: string
+              maxLength: 150
+            street:
+              type: string
+              maxLength: 150
+            town:
+              type: string
+              maxLength: 100
+            city:
+              type: string
+              maxLength: 100
+            postcode:
+              type: string
+              maxLength: 25
+        memosApply:
+          type: array
+          items:
+            type: string
+            description: >-
+              Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+        additionalNotes:
+          type: object
+          properties:
+            number:
+              type: array
+              nullable: true
+              description: Optional for all vehicle types
+              items:
+                type: string
+            guidanceNotes:
+              type: array
+              nullable: true
+              description: Optional for all vehicle types
+              items:
+                type: string
+        adrTypeApprovalNo:
+          type: string
+          nullable: true
+        adrCertificateNotes:
+          type: string
+          nullable: true
+          maxLength: 1500
+        tank:
+          type: object
+          nullable: true
+          properties:
+            tankDetails:
+              type: object
+              properties:
+                tankManufacturer:
+                  type: string
+                  maxLength: 70
+                  description: >-
+                    Mandatory. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                yearOfManufacture:
+                  type: number
+                  maximum: 2100
+                  minimum: 1800
+                  description: >-
+                    Mandatory. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                tankCode:
+                  type: string
+                  maxLength: 30
+                  description: >-
+                    Mandatory. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                specialProvisions:
+                  type: string
+                  maxLength: 1024
+                  nullable: true
+                  description: >-
+                    Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                tankManufacturerSerialNo:
+                  type: string
+                  maxLength: 50
+                  description: >-
+                    Mandatory. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                tankTypeAppNo:
+                  type: string
+                  maxLength: 30
+                  description: >-
+                    Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                tc2Details:
+                  type: object
+                  properties:
+                    tc2Type:
+                      type: string
+                      description: >-
+                        Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                      enum:
+                        - initial
+                    tc2IntermediateApprovalNo:
+                      type: string
+                      maxLength: 70
+                      description: >-
+                        Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                    tc2IntermediateExpiryDate:
+                      type: string
+                      format: date
+                      description: >-
+                        Optional. Date(YYYY-MM-DD). Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                tc3Details:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      tc3Type:
+                        type: string
+                        description: >-
+                          Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                        enum:
+                          - intermediate
+                          - periodic
+                          - exceptional
+                      tc3PeriodicNumber:
+                        type: string
+                        maxLength: 75
+                        description: >-
+                          Optional. Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+                      tc3PeriodicExpiryDate:
+                        type: string
+                        format: date
+                        description: >-
+                          Optional. Date(YYYY-MM-DD). Applicable only if vehicleDetails.type contains the word ‘tank’ or ‘battery’.
+            tankStatement:
+              type: object
+              properties:
+                substancesPermitted:
+                  type: string
+                  description: >-
+                    Mandatory IF vehicleDetails.type contains the word ‘tank’ or ‘battery’ ELSE, optional. If mandatory, users must select ONE of
+                    these. Users cannot select less/more than one
+                statement:
+                  type: string
+                  nullable: true
+                  maxLength: 1500
+                  description: >-
+                    Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’
+                productListRefNo:
+                  type: string
+                  nullable: true
+                  description: >-
+                    Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’
+                productListUnNo:
+                  type: array
+                  nullable: true
+                  description: 'Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’'
+                  items:
+                    type: string
+                productList:
+                  type: string
+                  maxLength: 1500
+                  description: >-
+                    Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’
+                  nullable: true
+    brakes:
+      type: object
+      properties:
+        brakeCodeOriginal:
+          type: string
+          maxLength: 3
+          description: Used only for PSV
+        brakeCode:
+          type: string
+          maxLength: 6
+          description: Used only for PSV
+        dataTrBrakeOne:
+          type: string
+          maxLength: 60
+          description: Used only for PSV
+        dataTrBrakeTwo:
+          type: string
+          maxLength: 60
+          description: Used only for PSV
+        dataTrBrakeThree:
+          type: string
+          maxLength: 60
+          description: Used only for PSV
+        retarderBrakeOne:
+          type: string
+          nullable: true
+          enum:
+            - electric
+            - exhaust
+            - friction
+            - hydraulic
+            - other
+            - none
+          description: Used only for PSV
+        retarderBrakeTwo:
+          type: string
+          nullable: true
+          enum:
+            - electric
+            - exhaust
+            - friction
+            - hydraulic
+            - other
+            - none
+          description: Used only for PSV
+        dtpNumber:
+          type: string
+          maxLength: 6
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        brakeForceWheelsNotLocked:
+          $ref: '#/components/schemas/brakeForceWheelsNotLocked'
+        brakeForceWheelsUpToHalfLocked:
+          $ref: '#/components/schemas/brakeForceWheelsUpToHalfLocked'
+        loadSensingValve:
+          type: boolean
+          description: Used only for TRL
+          nullable: true
+        antilockBrakingSystem:
+          type: boolean
+          description: Used only for TRL
+    brakeForceWheelsNotLocked:
+      type: object
+      properties:
+        serviceBrakeForceA:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        secondaryBrakeForceA:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        parkingBrakeForceA:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+    brakeForceWheelsUpToHalfLocked:
+      type: object
+      properties:
+        serviceBrakeForceB:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        secondaryBrakeForceB:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        parkingBrakeForceB:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+    axles:
+      type: array
+      items:
+        $ref: '#/components/schemas/weights'
+    weights:
+      type: object
+      properties:
+        axleNumber:
+          type: number
+          maximum: 99999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        parkingBrakeMrk:
+          type: boolean
+          nullable: true
+          description: 'Used for all vehicle types - PSV, HGV and TRL. Optional for HGV'
+        weights:
+          $ref: '#/components/schemas/axleWeightProperties'
+        tyres:
+          $ref: '#/components/schemas/axleTyreProperties'
+        brakes:
+          $ref: '#/components/schemas/axleBrakeProperties'
+    axleWeightProperties:
+      type: object
+      properties:
+        kerbWeight:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        ladenWeight:
+          type: number
+          maximum: 99999
+          description: Used only for PSV
+        gbWeight:
+          type: number
+          maximum: 99999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        eecWeight:
+          type: number
+          maximum: 99999
+          nullable: true
+          description: Used only for HGV and TRL
+        designWeight:
+          type: number
+          maximum: 99999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+    plates:
+      type: array
+      nullable: true
+      items:
+        type: object
+        properties:
+          plateSerialNumber:
+            type: string
+            maxLength: 12
+            nullable: true
+            description: Used for all vehicle types
+          plateIssueDate:
+            type: string
+            format: date
+            nullable: true
+            description: Used for all vehicle types
+          plateReasonForIssue:
+            type: string
+            enum:
+              - Free replacement
+              - Replacement
+              - Destroyed
+              - Provisional
+              - Original
+              - Manual
+            nullable: true
+            description: Used for all vehicle types
+          plateIssuer:
+            type: string
+            maxLength: 150
+            nullable: true
+            description: Used for all vehicle types
+    microfilm:
+      type: object
+      properties:
+        microfilmDocumentType:
+          type: string
+          nullable: true
+          description: Used for all vehicle types
+          enum:
+            - PSV Miscellaneous
+            - AAT - Trailer Annual Test
+            - AIV - HGV International App
+            - COIF Modification
+            - Trailer COC + Int Plate
+            - RCT - Trailer Test Cert paid
+            - HGV COC + Int Plate
+            - PSV Carry/Auth
+            - OMO Report
+            - AIT - Trailer International App
+            - IPV - HGV EEC Plate/Cert
+            - XCV - HGV Test Cert free
+            - AAV - HGV Annual Test
+            - COIF Master
+            - Tempo 100 Sp Ord
+            - Deleted
+            - PSV N/ALT
+            - XPT - Tr Plating Cert paid
+            - FFV - HGV First Test
+            - Repl Vitesse 100
+            - TCV - HGV Test Cert
+            - ZZZ -  Miscellaneous
+            - Test Certificate
+            - XCT - Trailer Test Cert free
+            - C52 - COC and VTG52A
+            - Tempo 100 Report
+            - Main File Amendment
+            - PSV Doc
+            - PSV COC
+            - PSV Repl COC
+            - TAV - COC
+            - NPT - Trailer Alteration
+            - OMO Certificate
+            - PSV Repl COIF
+            - PSV Repl COF
+            - COIF Application
+            - XPV - HGV Plating Cert Free
+            - TCT  - Trailer Test Cert
+            - Tempo 100 App
+            - PSV Decision on N/ALT
+            - Special Order PSV
+            - NPV - HGV Alteration
+            - No Description Found
+            - Vitesse 100 Sp Ord
+            - Brake Test Details
+            - COIF Productional
+            - RDT - Test Disc Paid
+            - RCV -  HGV Test Cert
+            - FFT -  Trailer First Test
+            - IPT - Trailer EEC Plate/Cert
+            - XDT - Test Disc Free
+            - PRV - HGV Plating Cert paid
+            - COF Cert
+            - PRT - Tr Plating Cert paid
+            - Tempo 100 Permit
+        microfilmRollNumber:
+          type: string
+          maxLength: 5
+          nullable: true
+          description: Used for all vehicle types
+        microfilmSerialNumber:
+          type: string
+          maxLength: 4
+          nullable: true
+          description: Used for all vehicle types
+    dda:
+      type: object
+      description: Disability Discrimination Act
+      properties:
+        certificateIssued:
+          type: boolean
+          description: Used only for PSV
+        wheelchairCapacity:
+          type: number
+          maximum: 99
+          nullable: true
+          description: Used only for PSV
+        wheelchairFittings:
+          type: string
+          maxLength: 250
+          nullable: true
+          description: Used only for PSV
+        wheelchairLiftPresent:
+          type: boolean
+          nullable: true
+          description: Used only for PSV
+        wheelchairLiftInformation:
+          type: string
+          maxLength: 250
+          nullable: true
+          description: Used only for PSV
+        wheelchairRampPresent:
+          type: boolean
+          nullable: true
+          description: Used only for PSV
+        wheelchairRampInformation:
+          type: string
+          maxLength: 250
+          nullable: true
+          description: Used only for PSV
+        minEmergencyExits:
+          type: number
+          maximum: 99
+          nullable: true
+          description: Used only for PSV
+        outswing:
+          type: string
+          maxLength: 250
+          nullable: true
+          description: Used only for PSV
+        ddaSchedules:
+          type: string
+          maxLength: 250
+          nullable: true
+          description: Used only for PSV
+        seatbeltsFitted:
+          type: number
+          maximum: 999
+          nullable: true
+          description: Used only for PSV
+        ddaNotes:
+          type: string
+          maxLength: 1024
+          nullable: true
+          description: Used only for PSV
+    authIntoService:
+      type: object
+      description: Authorization into service
+      properties:
+        cocIssueDate:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+        dateReceived:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+        datePending:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+        dateAuthorised:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+        dateRejected:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+    lettersOfAuth:
+      type: object
+      description: Letters of authorisation
+      properties:
+        letterType:
+          type: string
+          nullable: true
+          description: Used only for TRL
+          enum:
+            - Trailer authorization
+            - Trailer rejection
+        letterDateRequested:
+          type: string
+          format: date
+          nullable: true
+          description: Used only for TRL
+        letterContents:
+          type: string
+          nullable: true
+          description: Used only for TRL
+    applicantDetailsProperties:
+      type: object
+      description: Used for all vehicle types
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        address1:
+          type: string
+          maxLength: 60
+        address2:
+          type: string
+          maxLength: 60
+        postTown:
+          type: string
+          maxLength: 60
+        address3:
+          type: string
+          maxLength: 60
+          nullable: true
+        postCode:
+          type: string
+          maxLength: 12
+          nullable: true
+        emailAddress:
+          type: string
+          maxLength: 255
+          nullable: true
+        telephoneNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+    purchaserDetails:
+      type: object
+      description: Used for TRL only
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        address1:
+          type: string
+          maxLength: 60
+        address2:
+          type: string
+          maxLength: 60
+        postTown:
+          type: string
+          maxLength: 60
+        address3:
+          type: string
+          maxLength: 60
+          nullable: true
+        postCode:
+          type: string
+          maxLength: 12
+          nullable: true
+        emailAddress:
+          type: string
+          maxLength: 255
+          nullable: true
+        telephoneNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+        faxNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+        purchaserNotes:
+          type: string
+          maxLength: 1024
+          nullable: true
+    manufacturerDetails:
+      type: object
+      description: Used for TRL only
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        address1:
+          type: string
+          maxLength: 60
+        address2:
+          type: string
+          maxLength: 60
+        postTown:
+          type: string
+          maxLength: 60
+        address3:
+          type: string
+          maxLength: 60
+          nullable: true
+        postCode:
+          type: string
+          maxLength: 12
+          nullable: true
+        emailAddress:
+          type: string
+          maxLength: 255
+          nullable: true
+        telephoneNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+        faxNumber:
+          type: string
+          maxLength: 25
+          nullable: true
+        manufacturerNotes:
+          type: string
+          maxLength: 1024
+          nullable: true
+    axleTyreProperties:
+      type: object
+      properties:
+        tyreSize:
+          type: string
+          maxLength: 12
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        plyRating:
+          type: string
+          maxLength: 2
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+          nullable: true
+        fitmentCode:
+          type: string
+          enum:
+            - double
+            - single
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+        dataTrAxles:
+          type: number
+          maximum: 999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+          nullable: true
+        speedCategorySymbol:
+          type: string
+          enum:
+            - a7
+            - a8
+            - b
+            - c
+            - d
+            - e
+            - f
+            - g
+            - j
+            - k
+            - l
+            - m
+            - n
+            - p
+            - q
+          description: Used only for PSV
+        tyreCode:
+          type: number
+          maximum: 9999
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
+    axleBrakeProperties:
+      type: object
+      description: Used only for TRL
+      properties:
+        brakeActuator:
+          type: number
+          maximum: 999
+          nullable: true
+        leverLength:
+          type: number
+          maximum: 999
+          nullable: true
+        springBrakeParking:
+          type: boolean
+          nullable: true
+    completeTechRecordDB:
+      type: object
+      description: the Tech objects as they
+      additionalProperties: false
+      properties:
+        systemNumber:
+          type: string
+          description: It defines the composed primary key, in combination with "vin".
+        partialVin:
+          type: string
+        primaryVrm:
+          type: string
+        secondaryVrms:
+          type: array
+          nullable: true
+          items:
+            type: string
+            nullable: true
+        vin:
+          type: string
+          minLength: 1
+          maxLength: 21
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
+        trailerId:
+          type: string
+          maxLength: 8
+          description: Used only for TRL
+        techRecord:
+          $ref: '#/components/schemas/techRecords'
+security:
+  - OAuth2:
+      - read
+      - write
+servers:
+  - url: 'https://url/api/v1'

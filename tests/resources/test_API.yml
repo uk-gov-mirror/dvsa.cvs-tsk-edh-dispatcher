@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is the test API spec.
+  version: 1.0.0
+  title: Test Results Microservice
+  termsOfService: ''
+  contact:
+    email: test@test.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+  /test:
+    post:
+      summary: Submitting a new test thing
+      requestBody:
+        description: Post the test results
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/completeTestResults'
+      responses:
+        '201':
+          description: Test records created
+        '401':
+          description: Not authenticated
+        '403':
+          description: Unauthorised Access
+        '404':
+          description: Operation not supported
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
+          scopes:
+            read: Grants read access
+            write: Grants write access
+  schemas:
+    testObject:
+      type: object
+      properties:
+        testThing1:
+          type: string
+        testThing2:
+          type: number
+          nullable: true
+        testThing3:
+          type: number
+security:
+  - ApiKeyAuth: []
+  - OAuth2:
+      - read
+      - write
+servers:
+  - url: 'https://url/api/v1'
