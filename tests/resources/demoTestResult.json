@@ -19,12 +19,14 @@
   "testStationPNumber": "09-4129632",
   "testStationType": "gvts",
   "testStatus": "submitted",
+  "shouldEmailCertificate": "true",
   "testTypes": [
     {
       "additionalCommentsForAbandon": null,
       "additionalNotesRecorded": "sds",
       "certificateNumber": "W01A00633",
       "createdAt": "2020-04-15T09:44:27.616Z",
+      "statusUpdatedFlag": false,
       "customDefects": [
 
       ],

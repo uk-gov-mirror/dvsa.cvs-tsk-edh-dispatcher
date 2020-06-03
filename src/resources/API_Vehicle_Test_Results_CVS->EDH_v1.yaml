@@ -156,6 +156,7 @@ components:
         reasonForCreation:
           type: string
           nullable: true
+          maxLength: 500
           description: 'Applicable only when updating/creating a test from VTM'
         createdAt:
           type: string
@@ -177,6 +178,9 @@ components:
         lastUpdatedById:
           type: string
           description: 'Applicable only when updating/creating a test from VTM'
+        shouldEmailCertificate:
+          type: string
+          description: 'Not sent from FE, calculated in BE. Applicable only when updating a test from VTM. Used to determine if a certificate should be emailed or not after an update.'
         testStationName:
           type: string
           maxLength: 999
@@ -399,6 +403,7 @@ components:
         reasonForCreation:
           type: string
           nullable: true
+          maxLength: 500
           description: 'Applicable only when updating/creating a test from VTM'
         createdAt:
           type: string
@@ -420,6 +425,9 @@ components:
         lastUpdatedById:
           type: string
           description: 'Applicable only when updating/creating a test from VTM'
+        shouldEmailCertificate:
+          type: string
+          description: 'Not sent from FE, calculated in BE. Applicable only when updating a test from VTM. Used to determine if a certificate should be emailed or not after an update.'
         testStationName:
           type: string
           maxLength: 999
@@ -672,6 +680,10 @@ components:
           format: date-time
           nullable: true
           description: Nullable only for Cancelled tests.
+        statusUpdatedFlag:
+          type: boolean
+          nullable: true
+          description: 'Sent from FE. Used to determine which test-type was updated/archived'
         numberOfSeatbeltsFitted:
           type: number
           nullable: true
