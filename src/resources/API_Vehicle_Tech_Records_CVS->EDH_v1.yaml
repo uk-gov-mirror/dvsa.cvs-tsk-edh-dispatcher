@@ -161,7 +161,7 @@ components:
           description: Used for motorcycles to derive the test codes for specialist tests. Used for HGV and PSV.
         euVehicleCategory:
           type: string
-          description: Used for HGV and PSV. Optional for car, lgv and motorcycle.
+          description: Used for all vehicle types. Optional for car, lgv and motorcycle.
           enum:
             - m1
             - m2
@@ -618,7 +618,7 @@ components:
                 - 'MOT class 5'
                 - 'PSV of unknown or unspecified size'
                 - 'Not Known'
-          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle. Mandatory only for motorcycle.'
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle. Optional for CAR and LGV'
         vehicleSubclass:
           type: array
           items:
@@ -945,7 +945,7 @@ components:
         dtpNumber:
           type: string
           maxLength: 6
-          description: 'Used for all vehicle types - PSV, HGV and TRL'
+          description: 'Used for PSV, HGV and TRL'
         brakeForceWheelsNotLocked:
           $ref: '#/components/schemas/brakeForceWheelsNotLocked'
         brakeForceWheelsUpToHalfLocked:
@@ -1062,6 +1062,11 @@ components:
           plateIssuer:
             type: string
             maxLength: 150
+            nullable: true
+            description: Used for all vehicle types
+          toEmailAddress:
+            type: string
+            maxLength: 255
             nullable: true
             description: Used for all vehicle types
     microfilm:
