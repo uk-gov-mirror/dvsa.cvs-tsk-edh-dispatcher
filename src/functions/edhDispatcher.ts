@@ -1,48 +1,41 @@
-import {Callback, Context, Handler} from "aws-lambda";
-import {AWSError, SQS} from "aws-sdk";
-import {DispatchService} from "../services/DispatchService";
-import {PromiseResult} from "aws-sdk/lib/request";
-import {SendMessageResult} from "aws-sdk/clients/sqs";
-import {GetRecordsOutput} from "aws-sdk/clients/dynamodbstreams";
-import {IStreamRecord} from "../models";
-import {DispatchDAO} from "../services/DispatchDAO";
-import requestPromise from "request-promise";
-import {SQService} from "../services/SQService";
-import {debugOnlyLog} from "../utils/Utils";
+import { SQSEvent, SQSHandler } from 'aws-lambda';
+import { SQS } from 'aws-sdk';
+import { Logger } from 'tslog';
+import { DispatchService } from '../services/DispatchService';
+import { SQService } from '../services/SQService';
 
+const testing = process.env.NODE_ENV === 'test';
 /**
- * λ function to process a DynamoDB stream of test results into a queue for certificate generation.
+ * λ function to process an SQS stream of records into a queue.
  * @param event - DynamoDB Stream event
- * @param context - λ Context
- * @param callback - callback function
  */
-const edhDispatcher: Handler = async (event: GetRecordsOutput, context?: Context, callback?: Callback): Promise<void | Array<PromiseResult<SendMessageResult, AWSError>>> => {
-    if (!event) {
-        console.error("ERROR: event is not defined.");
-        return;
-    }
-    debugOnlyLog("Event: ", event);
+const edhDispatcher: SQSHandler = async (event: SQSEvent): Promise<void> => {
+  const logger: Logger = new Logger({
+    name: 'HandlerLogger',
+    type: testing ? 'pretty' : 'json',
+    minLevel: testing ? 'debug' : 'warn',
+  });
+  logger.debug('Event: ', event);
 
-    const records = event.Records as IStreamRecord[];
-    if (!records || !records.length) {
-        console.error("ERROR: No Records in event: ", event);
-        return;
-    }
+  const records = event.Records;
+  if (!records || !records.length) {
+    logger.error('ERROR: No Records in event: ', event);
+    return;
+  }
 
-    // Instantiate the Simple Queue Service
-    const dispatchService: DispatchService = new DispatchService(new DispatchDAO(requestPromise), new SQService(new SQS()));
-    const sentMessagePromises: Array<Promise<any>> = [];
-    debugOnlyLog("Records: ", records);
+  // Instantiate the Simple Queue Service
+  const dispatchService: DispatchService = new DispatchService(new SQService(new SQS(), logger.getChildLogger({ name: 'SQService' })), logger.getChildLogger({ name: 'DispatchService' }));
+  const sentMessagePromises: Array<Promise<void>> = [];
+  logger.debug('Records: ', records);
 
-    records.forEach((record: IStreamRecord) => {
-        debugOnlyLog("Record: ", record);
-        const call = dispatchService.processEvent(record);
-        sentMessagePromises.push(call);
-    });
+  records.forEach((record) => {
+    logger.debug('Record: ', record);
+    const call = dispatchService.processSQSRecord(record);
+    sentMessagePromises.push(call);
+  });
 
-    let promises = await Promise.all(sentMessagePromises);
-    debugOnlyLog("Response: ", promises);
-    return promises
+  const promises = await Promise.all(sentMessagePromises);
+  logger.debug('Response: ', promises);
 };
 
-export {edhDispatcher};
+export { edhDispatcher };

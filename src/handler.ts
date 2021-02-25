@@ -1,13 +1,12 @@
-import {edhDispatcher} from "./functions/edhDispatcher";
-import {config as AWSConfig} from "aws-sdk";
+import { config as AWSConfig } from 'aws-sdk';
+import { edhDispatcher } from './functions/edhDispatcher';
+import { Configuration } from './utils/Configuration';
 
-const isOffline: boolean = (!process.env.BRANCH || process.env.BRANCH === "local");
-
-if (isOffline) {
-    AWSConfig.credentials = {
-        accessKeyId: "offline",
-        secretAccessKey: "offline"
-    };
+if (Configuration.getInstance().getEnv() === 'local') {
+  AWSConfig.credentials = {
+    accessKeyId: 'offline',
+    secretAccessKey: 'offline',
+  };
 }
 
-export {edhDispatcher as handler};
+export { edhDispatcher as handler };

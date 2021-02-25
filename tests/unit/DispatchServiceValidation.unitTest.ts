@@ -1,77 +1,72 @@
-import {ITarget} from "../../src/models";
-import {Configuration} from "../../src/utils/Configuration";
-import {DispatchService} from "../../src/services/DispatchService";
-import testResult from "../resources/demoTestResult.json";
+import { Logger } from 'tslog';
+import { readFileSync } from 'fs';
+import { Target, TargetRecord } from '../../src/models/interfaces';
+import { DispatchService } from '../../src/services/DispatchService';
+import { DynamoDB } from "aws-sdk";
 
-describe("isValidMessageBody", () => {
-  let origProcEnv: any;
+describe('isValidMessageBody', () => {
+  let origProcEnv: NodeJS.ProcessEnv;
   beforeAll(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
     jest.restoreAllMocks();
-    origProcEnv = process.env
+    origProcEnv = process.env;
   });
-  const target: ITarget = {
-    queue: "",
-    dlQueue: "",
-    swaggerSpecFile: "API_Vehicle_Test_Results_CVS->EDH_v1.yaml",
-    schemaItem: "completeTestResults",
-    endpoints: {
-      INSERT: "",
-      MODIFY: "",
-      REMOVE: "",
-    }
+  const target: Target = {
+    queue: '',
+    dlQueue: '',
+    swaggerSpecFile: 'API_Vehicle_Test_Results_CVS->EDH_v1.yaml',
+    schemaItem: 'completeTestResults',
   };
-  describe("When validation = true", () => {
+  const invalidRecord = { eventType: 'invalid', streamEvent: {} } as unknown as TargetRecord;
+  describe('When validation = true', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
     beforeAll(() => {
-      process.env.VALIDATION = "TRUE";
-    })
+      process.env.VALIDATION = 'TRUE';
+    });
     afterAll(() => {
       process.env = origProcEnv;
-    })
+    });
 
-    it("returns false when evaluating a completely invalid record against a valid spec", async () => {
-      const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
-      //@ts-ignore
-      svc.basePath = "./src/resources/";
-      const output = await svc.isValidMessageBody({something: "invalid"}, target);
+    it('returns false when evaluating a completely invalid record against a valid spec', async () => {
+      const svc = new DispatchService(new (jest.fn())(), new Logger({ name: 'DispatchServiceValidation' }));
+      const output = await svc.isValidMessageBody(invalidRecord, target);
       expect(output).toEqual(false);
     });
     it("returns true when evaluating a 'good' record against a valid spec", async () => {
-      const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
-      //@ts-ignore
-      svc.basePath = "./src/resources/";
-      const output = await svc.isValidMessageBody(testResult, target);
+      const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
+      const validRecord = DynamoDB.Converter.unmarshall(JSON.parse(readFileSync('./tests/resources/stream-event.json', 'utf-8')).Records[0].NewImage);
+      const body = { eventType: 'INSERT', body: validRecord };
+      const output = await svc.isValidMessageBody(body, target);
       expect(output).toEqual(true);
     });
   });
-  describe("when validation = false", () => {
+  describe('when validation = false', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
     beforeAll(() => {
-      process.env.VALIDATION = "false";
-    })
+      process.env.VALIDATION = 'false';
+    });
     afterAll(() => {
       process.env = origProcEnv;
-    })
+    });
 
-    it("always returns true", async () => {
-      const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
-      const output = await svc.isValidMessageBody({something: "invalid"}, target);
+    it('always returns true', async () => {
+      const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
+      const output = await svc.isValidMessageBody(invalidRecord, target);
       expect(output).toEqual(true);
     });
   });
-  describe("when validation is not set in secrets", () => {
+  describe('when validation is not set in secrets', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
-    it("always returns true", async () => {
-      const svc = new DispatchService(new (jest.fn()), new (jest.fn()));
-      const output = await svc.isValidMessageBody({something: "invalid"}, target);
+    it('always returns true', async () => {
+      const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
+      const output = await svc.isValidMessageBody(invalidRecord, target);
       expect(output).toEqual(true);
     });
   });
