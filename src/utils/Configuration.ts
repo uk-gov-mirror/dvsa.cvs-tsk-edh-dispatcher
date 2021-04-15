@@ -1,11 +1,11 @@
-import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from 'aws-sdk/clients/secretsmanager';
-import { captureAWSClient } from 'aws-xray-sdk';
-import { load } from 'js-yaml';
-import { readFileSync } from 'fs';
-import { env } from 'process';
-import { render } from 'template-file';
-import { ERROR } from '../models/enums';
-import { Config, SecretConfig, TargetConfig } from '../models/interfaces';
+import SecretsManager, {GetSecretValueRequest, GetSecretValueResponse} from 'aws-sdk/clients/secretsmanager';
+import {captureAWSClient} from 'aws-xray-sdk';
+import {load} from 'js-yaml';
+import {readFileSync} from 'fs';
+import {env} from 'process';
+import {ERROR} from '../models/enums';
+import {Config, SecretConfig, TargetConfig} from '../models/interfaces';
+import path from "path";
 
 /**
  * Helper class for retrieving project configuration
@@ -23,14 +23,51 @@ class Configuration {
 
   private constructor(configPath: string) {
     this.secretsClient = captureAWSClient(new SecretsManager({ region: 'eu-west-1' }));
+
     if (!env.BRANCH) throw new Error(ERROR.NO_BRANCH_ENV);
     this.env = env.BRANCH === 'local' ? 'local' : 'remote';
-    const data = {
-      BRANCH: this.env === 'local' ? this.env : env.BRANCH,
-    };
-    this.config = load(
-      render(readFileSync(configPath, 'utf-8'), data),
-    ) as Config;
+
+    this.config = load(readFileSync(configPath, 'utf-8')) as Config;
+    console.log('config before replacements (new)', this.config);
+
+    // copy-pasted method from edh-marshaller - no time for anything else. Sorry future devs
+
+    // Replace environment variable references
+    let stringifiedConfig: string = JSON.stringify(this.config);
+    const envRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
+    const matches: RegExpMatchArray | null = stringifiedConfig.match(envRegex);
+
+    if (matches) {
+      matches.forEach((match: string) => {
+        envRegex.lastIndex = 0;
+        const captureGroups: RegExpExecArray = envRegex.exec(match) as RegExpExecArray;
+
+        // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
+        stringifiedConfig = stringifiedConfig.replace(match, (process.env[captureGroups[1]] || captureGroups[2] || captureGroups[1]));
+      });
+    }
+
+    this.config = JSON.parse(stringifiedConfig);
+    console.log('config after replacements (new)', this.config);
+
+    // if (!env.BRANCH) throw new Error(ERROR.NO_BRANCH_ENV);
+    // this.env = env.BRANCH === 'local' ? 'local' : 'remote';
+    // const data = {
+    //   BRANCH: this.env === 'local' ? this.env : env.BRANCH,
+    // };
+    // console.log("configuration loaded. BRANCH = ", env.BRANCH);
+    //
+    // const template = readFileSync(configPath, 'utf-8');
+    // console.log('YML template before replacements', template);
+    //
+    // const ymlRendered = render(template, data);
+    // console.log('YML template after replacements', ymlRendered);
+    //
+    // this.config = load(
+    //   ymlRendered,
+    // ) as Config;
+    //
+    // console.log("config after js-yaml", this.config);
   }
 
   /**
@@ -39,9 +76,10 @@ class Configuration {
    */
   public static getInstance(): Configuration {
     if (!this.instance) {
-      this.instance = new Configuration('src/config/config.yml');
+      this.instance = new Configuration(path.resolve(__dirname, '../config/config.yml'));
     }
 
+    console.log('Configuration::getInstance called, retrieving config', Configuration.instance)
     return Configuration.instance;
   }
 

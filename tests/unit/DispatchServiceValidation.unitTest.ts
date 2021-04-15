@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { Target, TargetRecord } from '../../src/models/interfaces';
 import { DispatchService } from '../../src/services/DispatchService';
 import { DynamoDB } from "aws-sdk";
+import {DynamoDBRecord} from "aws-lambda";
 
 describe('isValidMessageBody', () => {
   let origProcEnv: NodeJS.ProcessEnv;
@@ -15,10 +16,10 @@ describe('isValidMessageBody', () => {
   const target: Target = {
     queue: '',
     dlQueue: '',
-    swaggerSpecFile: 'API_Vehicle_Test_Results_CVS->EDH_v1.yaml',
+    swaggerSpecFile: 'API_Vehicle_Test_Results_CVS_EDH_v1.yaml',
     schemaItem: 'completeTestResults',
   };
-  const invalidRecord = { eventType: 'invalid', streamEvent: {} } as unknown as TargetRecord;
+  const invalidRecord = { eventName: 'invalid', dynamodb: { NewImage: { hello: "world" } } } as unknown as DynamoDBRecord;
   describe('When validation = true', () => {
     afterEach(() => {
       jest.clearAllMocks();
@@ -38,7 +39,7 @@ describe('isValidMessageBody', () => {
     it("returns true when evaluating a 'good' record against a valid spec", async () => {
       const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
       const validRecord = DynamoDB.Converter.unmarshall(JSON.parse(readFileSync('./tests/resources/stream-event.json', 'utf-8')).Records[0].NewImage);
-      const body = { eventType: 'INSERT', body: validRecord };
+      const body: DynamoDBRecord = { eventName: 'INSERT', dynamodb: { NewImage: validRecord } };
       const output = await svc.isValidMessageBody(body, target);
       expect(output).toEqual(true);
     });

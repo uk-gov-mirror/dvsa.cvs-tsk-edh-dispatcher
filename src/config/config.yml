@@ -16,15 +16,15 @@ targets:
   test-results:
     queue: cvs-update-store-${BRANCH}-queue
     dlQueue: cvs-update-store-${BRANCH}-dlq
-    swaggerSpecFile: API_Vehicle_Test_Results_CVS->EDH_v1.yaml
+    swaggerSpecFile: API_Vehicle_Test_Results_CVS_EDH_v1.yaml
     schemaItem: completeTestResults
   activities:
     queue: cvs-update-store-${BRANCH}-queue
     dlQueue: cvs-update-store-${BRANCH}-dlq
-    swaggerSpecFile: API_Activities_CVS->EDH_v1.yaml
+    swaggerSpecFile: API_Activities_CVS_EDH_v1.yaml
     schemaItem: activity
-  technical-records:
+  technical_records:
     queue: cvs-update-store-${BRANCH}-queue
     dlQueue: cvs-update-store-${BRANCH}-dlq
-    swaggerSpecFile: API_Vehicle_Tech_Records_CVS->EDH_v1.yaml
+    swaggerSpecFile: API_Vehicle_Tech_Records_CVS_EDH_v1.yaml
     schemaItem: completeTechRecordDB

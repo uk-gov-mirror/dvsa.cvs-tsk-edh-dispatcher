@@ -46,8 +46,8 @@ describe('Dispatch Service', () => {
 
     describe('with invalid event type & Bad ARN', () => {
       const event = {
-        eventType: 'NOT_A_THING',
-        body: { NewImage: {} },
+        eventName: 'NOT_A_THING',
+        dynamodb: { NewImage: {} },
       } as unknown as Body;
       const record: SQSRecord = {
         ...mockSQSRecord,
@@ -72,8 +72,8 @@ describe('Dispatch Service', () => {
 
     describe('with invalid event type', () => {
       const event = {
-        eventType: 'NOT_A_THING',
-        body: { NewImage: {} },
+        eventName: 'NOT_A_THING',
+        dynamodb: { NewImage: {} },
       };
       const record: SQSRecord = {
         ...mockSQSRecord,
@@ -90,8 +90,8 @@ describe('Dispatch Service', () => {
 
     describe('with valid INSERT event type', () => {
       const event = {
-        eventType: 'INSERT',
-        body: {
+        eventName: 'INSERT',
+        dynamodb: {
           Keys: { testResultId: { S: '123' } },
           NewImage: body,
         },
@@ -111,8 +111,8 @@ describe('Dispatch Service', () => {
 
     describe('with valid MODIFY event type', () => {
       const event = {
-        eventType: 'MODIFY',
-        body: {
+        eventName: 'MODIFY',
+        dynamodb: {
           Keys: { testResultId: { S: '123' } },
           NewImage: body,
         },
@@ -132,9 +132,10 @@ describe('Dispatch Service', () => {
 
     describe('with valid REMOVE event type', () => {
       const event = {
-        eventType: 'REMOVE',
-        body: {
+        eventName: 'REMOVE',
+        dynamodb: {
           Keys: { testResultId: { S: '123' } },
+          OldImage: {}
         },
       };
       const record: SQSRecord = {
