@@ -28,7 +28,6 @@ class Configuration {
     this.env = env.BRANCH === 'local' ? 'local' : 'remote';
 
     this.config = load(readFileSync(configPath, 'utf-8')) as Config;
-    console.log('config before replacements (new)', this.config);
 
     // copy-pasted method from edh-marshaller - no time for anything else. Sorry future devs
 
@@ -48,7 +47,6 @@ class Configuration {
     }
 
     this.config = JSON.parse(stringifiedConfig);
-    console.log('config after replacements (new)', this.config);
 
     // if (!env.BRANCH) throw new Error(ERROR.NO_BRANCH_ENV);
     // this.env = env.BRANCH === 'local' ? 'local' : 'remote';
@@ -79,7 +77,6 @@ class Configuration {
       this.instance = new Configuration(path.resolve(__dirname, '../config/config.yml'));
     }
 
-    console.log('Configuration::getInstance called, retrieving config', Configuration.instance)
     return Configuration.instance;
   }
 

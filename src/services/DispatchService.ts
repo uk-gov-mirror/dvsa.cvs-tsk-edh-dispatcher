@@ -66,7 +66,6 @@ class DispatchService {
       return;
     }
 
-    console.log('eventPayload', dynamoEvent);
     this.logger.debug('eventPayload: ', dynamoEvent);
 
     await this.sendRecord(dynamoEvent, target);
