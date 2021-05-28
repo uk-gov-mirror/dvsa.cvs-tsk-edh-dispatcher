@@ -52,7 +52,7 @@
     "aws-sdk": "^2.846.0",
     "aws-xray-sdk": "^3.2.0",
     "js-yaml": "^4.0.0",
-    "openapi-enforcer": "^1.13.3",
+    "openapi-enforcer": "^1.14.1",
     "reflect-metadata": "^0.1.13",
     "template-file": "^5.1.0",
     "tslog": "^3.1.1"
