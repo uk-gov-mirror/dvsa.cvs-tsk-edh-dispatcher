@@ -28,9 +28,6 @@ describe('Dispatch Service', () => {
     afterAll(() => {
       secretConfig.mockRestore();
     });
-    const SQSMock = jest.fn().mockImplementation(() => ({
-      sendMessage: jest.fn(),
-    }));
 
     const secretConfig = jest.spyOn(Configuration.prototype, 'getSecretConfig').mockResolvedValue(Promise.resolve({
       baseUrl: '',
@@ -42,9 +39,13 @@ describe('Dispatch Service', () => {
     const sendRecordMock = jest.spyOn(DispatchService.prototype, 'sendRecord');
     const dlqMock = jest.spyOn(DispatchService.prototype, 'sendRecordToDLQ');
     const body = { test: { S: 'value' } };
-    const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
 
     describe('with invalid event type & Bad ARN', () => {
+      const SQSMock = jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn(),
+        getSQSClient: jest.fn().mockReturnValue({ getMessageContent: jest.fn().mockResolvedValue('{}') }),
+      }));
+      const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
       const event = {
         eventName: 'NOT_A_THING',
         dynamodb: { NewImage: {} },
@@ -71,6 +72,11 @@ describe('Dispatch Service', () => {
     });
 
     describe('with invalid event type', () => {
+      const SQSMock = jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn(),
+        getSQSClient: jest.fn().mockReturnValue({ getMessageContent: jest.fn().mockResolvedValue('{}') }),
+      }));
+      const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
       const event = {
         eventName: 'NOT_A_THING',
         dynamodb: { NewImage: {} },
@@ -89,6 +95,15 @@ describe('Dispatch Service', () => {
     });
 
     describe('with valid INSERT event type', () => {
+      const SQSMock = jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn(),
+        getSQSClient: jest.fn().mockReturnValue(
+          {
+            getMessageContent: jest.fn().mockResolvedValue('{"eventName":"INSERT", "dynamodb": {"NewImage": {}}}'),
+          },
+        ),
+      }));
+      const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
       const event = {
         eventName: 'INSERT',
         dynamodb: {
@@ -110,6 +125,15 @@ describe('Dispatch Service', () => {
     });
 
     describe('with valid MODIFY event type', () => {
+      const SQSMock = jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn(),
+        getSQSClient: jest.fn().mockReturnValue(
+          {
+            getMessageContent: jest.fn().mockResolvedValue('{"eventName":"MODIFY", "dynamodb": {"NewImage": {}}}'),
+          },
+        ),
+      }));
+      const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
       const event = {
         eventName: 'MODIFY',
         dynamodb: {
@@ -131,11 +155,20 @@ describe('Dispatch Service', () => {
     });
 
     describe('with valid REMOVE event type', () => {
+      const SQSMock = jest.fn().mockImplementation(() => ({
+        sendMessage: jest.fn(),
+        getSQSClient: jest.fn().mockReturnValue(
+          {
+            getMessageContent: jest.fn().mockResolvedValue('{"eventName":"REMOVE", "dynamodb": {"OldImage": {}}}'),
+          },
+        ),
+      }));
+      const svc = new DispatchService(new SQSMock(), new Logger({ name: 'DispatchServiceTest' }));
       const event = {
         eventName: 'REMOVE',
         dynamodb: {
           Keys: { testResultId: { S: '123' } },
-          OldImage: {}
+          OldImage: {},
         },
       };
       const record: SQSRecord = {
