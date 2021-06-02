@@ -1,20 +1,22 @@
-import {
+import SQS, {
+  GetQueueUrlResult,
   MessageBodyAttributeMap,
+  SendMessageRequest,
   SendMessageResult,
 } from 'aws-sdk/clients/sqs';
 import { PromiseResult } from 'aws-sdk/lib/request';
-import { AWSError, config as AWSConfig } from 'aws-sdk';
+import { AWSError } from 'aws-sdk';
 import { Logger } from 'tslog';
+import { captureAWSClient } from 'aws-xray-sdk';
 import { Configuration } from '../utils/Configuration';
 import { ERROR } from '../models/enums';
 import { Config } from '../models/interfaces';
-import { SqsService } from '../utils/sqs-huge-msg';
 
 /**
  * Service class for interfacing with the Simple Queue Service
  */
 class SQService {
-  private readonly sqsClient: SqsService;
+  private readonly sqsClient: SQS;
 
   private readonly config: Config;
 
@@ -25,10 +27,10 @@ class SQService {
    * @param sqsClient - The Simple Queue Service client
    * @param logger
    */
-  constructor(sqsClient: SqsService, logger: Logger) {
+  constructor(sqsClient: SQS, logger: Logger) {
     this.logger = logger;
     this.config = Configuration.getInstance().getConfig();
-    this.sqsClient = sqsClient;
+    this.sqsClient = captureAWSClient(sqsClient);
 
     if (!this.config.sqs) {
       throw new Error(ERROR.NO_SQS_CONFIG);
@@ -37,14 +39,14 @@ class SQService {
     // Not defining BRANCH will default to local
     // Disabling as we are only injecting local or remote
     // eslint-disable-next-line security/detect-object-injection
-    AWSConfig.sqs = Configuration.getInstance().getSQSParams();
+    this.sqsClient.config.update(Configuration.getInstance().getSQSParams());
   }
 
   public getConfig(): Config {
     return this.config;
   }
 
-  public getSQSClient(): SqsService {
+  public getSQSClient(): SQS {
     return this.sqsClient;
   }
 
@@ -54,11 +56,25 @@ class SQService {
    * @param messageAttributes - A MessageAttributeMap
    * @param queueName - The queue name
    */
-  public async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<void|PromiseResult<SendMessageResult, AWSError>> {
+  public async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
     this.logger.debug(`Sending message to ${queueName}: `, messageBody);
 
+    // Get the queue URL for the provided queue name
+    const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
+      .promise();
+
+    if (!queueUrlResult.QueueUrl) {
+      throw new Error(ERROR.FAILED_Q_URL);
+    }
+
+    const params: SendMessageRequest = {
+      QueueUrl: queueUrlResult.QueueUrl,
+      MessageBody: messageBody,
+      MessageAttributes: messageAttributes,
+    };
+
     // Send a message to the queue
-    return this.sqsClient.sendMessage(queueName, messageBody, messageAttributes);
+    return this.sqsClient.sendMessage(params).promise();
   }
 }
 

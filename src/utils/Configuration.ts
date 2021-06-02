@@ -1,11 +1,11 @@
-import SecretsManager, { GetSecretValueRequest, GetSecretValueResponse } from 'aws-sdk/clients/secretsmanager';
-import { captureAWSClient } from 'aws-xray-sdk';
-import { load } from 'js-yaml';
-import { readFileSync } from 'fs';
-import { env } from 'process';
-import path from 'path';
-import { ERROR } from '../models/enums';
-import { Config, SecretConfig, TargetConfig } from '../models/interfaces';
+import SecretsManager, {GetSecretValueRequest, GetSecretValueResponse} from 'aws-sdk/clients/secretsmanager';
+import {captureAWSClient} from 'aws-xray-sdk';
+import {load} from 'js-yaml';
+import {readFileSync} from 'fs';
+import {env} from 'process';
+import {ERROR} from '../models/enums';
+import {Config, SecretConfig, TargetConfig} from '../models/interfaces';
+import path from "path";
 
 /**
  * Helper class for retrieving project configuration
@@ -33,7 +33,7 @@ class Configuration {
 
     // Replace environment variable references
     let stringifiedConfig: string = JSON.stringify(this.config);
-    const envRegex = /\${(\w+\b):?(\w+\b)?}/g;
+    const envRegex: RegExp = /\${(\w+\b):?(\w+\b)?}/g;
     const matches: RegExpMatchArray | null = stringifiedConfig.match(envRegex);
 
     if (matches) {
