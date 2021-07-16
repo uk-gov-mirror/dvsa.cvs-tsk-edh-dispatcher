@@ -3,14 +3,14 @@ import SQS, {
   MessageBodyAttributeMap,
   SendMessageRequest,
   SendMessageResult,
-} from 'aws-sdk/clients/sqs';
-import { PromiseResult } from 'aws-sdk/lib/request';
-import { AWSError } from 'aws-sdk';
-import { Logger } from 'tslog';
-import { captureAWSClient } from 'aws-xray-sdk';
-import { Configuration } from '../utils/Configuration';
-import { ERROR } from '../models/enums';
-import { Config } from '../models/interfaces';
+} from "aws-sdk/clients/sqs";
+import { PromiseResult } from "aws-sdk/lib/request";
+import { AWSError } from "aws-sdk";
+import { Logger } from "tslog";
+import { captureAWSClient } from "aws-xray-sdk";
+import { Configuration } from "../utils/Configuration";
+import { ERROR } from "../models/enums";
+import { Config } from "../models/interfaces";
 
 /**
  * Service class for interfacing with the Simple Queue Service
@@ -56,11 +56,16 @@ class SQService {
    * @param messageAttributes - A MessageAttributeMap
    * @param queueName - The queue name
    */
-  public async sendMessage(messageBody: string, queueName: string, messageAttributes?: MessageBodyAttributeMap): Promise<PromiseResult<SendMessageResult, AWSError>> {
+  public async sendMessage(
+    messageBody: string,
+    queueName: string,
+    messageAttributes?: MessageBodyAttributeMap
+  ): Promise<PromiseResult<SendMessageResult, AWSError>> {
     this.logger.debug(`Sending message to ${queueName}: `, messageBody);
 
     // Get the queue URL for the provided queue name
-    const queueUrlResult: GetQueueUrlResult = await this.sqsClient.getQueueUrl({ QueueName: queueName })
+    const queueUrlResult: GetQueueUrlResult = await this.sqsClient
+      .getQueueUrl({ QueueName: queueName })
       .promise();
 
     if (!queueUrlResult.QueueUrl) {

@@ -18,7 +18,8 @@
     "test:unit": "BRANCH=local SLS_DEBUG=* AWS_XRAY_CONTEXT_MISSING=LOG_ERROR jest --testMatch=\"**/*.unitTest.ts\" --runInBand",
     "test": "npm run test:unit -- --coverage",
     "test-i": "echo 'nothing to do'",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
+    "format": "prettier --write .",
     "sonar-scanner": "sonar-scanner",
     "prepush": "npm test && npm run build && npm run test-i",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
@@ -73,6 +74,7 @@
     "jest": "^26.6.3",
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
+    "prettier": "^2.3.2",
     "serverless": "^2.46.0",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^1.1.9",
@@ -94,7 +96,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm lint",
+      "pre-commit": "npm run security-checks && npm run audit && npm lint && npm run format",
       "pre-push": "npm run prepush"
     }
   }

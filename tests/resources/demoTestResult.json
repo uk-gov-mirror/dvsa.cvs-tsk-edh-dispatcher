@@ -25,12 +25,8 @@
       "additionalNotesRecorded": "sds",
       "certificateNumber": "W01A00633",
       "createdAt": "2020-04-15T09:44:27.616Z",
-      "customDefects": [
-
-      ],
-      "defects": [
-
-      ],
+      "customDefects": [],
+      "defects": [],
       "emissionStandard": "0.03 g/kWh Euro IV PM",
       "fuelType": null,
       "lastUpdatedAt": "2020-04-15T09:44:27.616Z",
