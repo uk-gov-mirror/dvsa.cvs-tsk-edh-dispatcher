@@ -4,14 +4,14 @@ info:
     This is the API spec for the integration between EDH and CVS for synchronising Test Results records.
   version: 1.0.0
   title: Test Results CVS->EDH integration
-  termsOfService: "http://test.com"
+  termsOfService: 'http://test.com'
   contact:
     email: akothiyal@deloitte.co.uk
   license:
     name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  "/test-results/{systemNumber}":
+  '/test-results/{systemNumber}':
     post:
       summary: Submitting a new test records
       requestBody:
@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/completeTestResults"
+              $ref: '#/components/schemas/completeTestResults'
       parameters:
         - in: path
           name: systemNumber
@@ -28,22 +28,22 @@ paths:
             type: string
           required: true
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Not authenticated
-        "403":
+        '403':
           description: Unauthorised Access
-        "404":
+        '404':
           description: Operation not supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     put:
-      summary: "Update a test result, for a particular system number"
+      summary: 'Update a test result, for a particular system number'
       tags:
         - updateTestResults
       parameters:
@@ -58,21 +58,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/completeTestResults"
+              $ref: '#/components/schemas/completeTestResults'
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Not authenticated
-        "403":
+        '403':
           description: Unauthorised Access
-        "404":
+        '404':
           description: Operation not supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     delete:
       summary: Delete the identified Test Result - will probably never be used.
@@ -84,19 +84,19 @@ paths:
           required: true
           description: Unique Identifier for a vehicle record
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
 components:
   securitySchemes:
@@ -104,8 +104,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "https://example.com/oauth/authorize"
-          tokenUrl: "https://example.com/oauth/token"
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
           scopes:
             read: Grants read access
             write: Grants write access
@@ -139,11 +139,11 @@ components:
         deletionFlag:
           type: boolean
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testHistory:
           type: array
           items:
-            $ref: "#/components/schemas/historicalTestResults"
+            $ref: '#/components/schemas/historicalTestResults'
           nullable: true
           description: Array of archived test-results. The test-results in this array won't have the testHistory attribute and testVersion will always be archived. Should not be sent when performing an update
         testVersion:
@@ -156,27 +156,27 @@ components:
         reasonForCreation:
           type: string
           nullable: true
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         createdAt:
           type: string
           format: date-time
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         createdByName:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         createdById:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         lastUpdatedAt:
           type: string
           format: date-time
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         lastUpdatedByName:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         lastUpdatedById:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         testStationName:
           type: string
           maxLength: 999
@@ -227,36 +227,36 @@ components:
               type: string
               nullable: true
               enum:
-                - "2"
-                - "n"
-                - "s"
-                - "1"
-                - "t"
-                - "l"
-                - "3"
-                - "v"
-                - "4"
-                - "7"
-                - "5"
-                - "p"
-                - "u"
+                - '2'
+                - 'n'
+                - 's'
+                - '1'
+                - 't'
+                - 'l'
+                - '3'
+                - 'v'
+                - '4'
+                - '7'
+                - '5'
+                - 'p'
+                - 'u'
             description:
               type: string
               nullable: true
               enum:
-                - "motorbikes over 200cc or with a sidecar"
-                - "not applicable"
-                - "small psv (ie: less than or equal to 22 seats)"
-                - "motorbikes up to 200cc"
-                - "trailer"
-                - "large psv(ie: greater than 23 seats)"
-                - "3 wheelers"
-                - "heavy goods vehicle"
-                - "MOT class 4"
-                - "MOT class 7"
-                - "MOT class 5"
-                - "PSV of unknown or unspecified size"
-                - "Not Known"
+                - 'motorbikes over 200cc or with a sidecar'
+                - 'not applicable'
+                - 'small psv (ie: less than or equal to 22 seats)'
+                - 'motorbikes up to 200cc'
+                - 'trailer'
+                - 'large psv(ie: greater than 23 seats)'
+                - '3 wheelers'
+                - 'heavy goods vehicle'
+                - 'MOT class 4'
+                - 'MOT class 7'
+                - 'MOT class 5'
+                - 'PSV of unknown or unspecified size'
+                - 'Not Known'
           description:
             Mandatory only for motorcycles. 2 = MotorBikes over 200cc or with a sidecar, N = Not Applicable, S =
             Small PSV i.e less than or equal to 22 seats, 1 = Motorbikes upto
@@ -361,7 +361,7 @@ components:
           description: Used only for TRL
           nullable: true
         testTypes:
-          $ref: "#/components/schemas/testTypes"
+          $ref: '#/components/schemas/testTypes'
     historicalTestResults:
       type: object
       additionalProperties: false
@@ -391,7 +391,7 @@ components:
         deletionFlag:
           type: boolean
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testVersion:
           type: string
           description: Tests submitted from the mobile app won't have this attribute. Tests updated/created by VTM will do.
@@ -400,27 +400,27 @@ components:
         reasonForCreation:
           type: string
           nullable: true
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         createdAt:
           type: string
           format: date-time
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         createdByName:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         createdById:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         lastUpdatedAt:
           type: string
           format: date-time
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         lastUpdatedByName:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         lastUpdatedById:
           type: string
-          description: "Applicable only when updating/creating a test from VTM"
+          description: 'Applicable only when updating/creating a test from VTM'
         testStationName:
           type: string
           maxLength: 999
@@ -471,36 +471,36 @@ components:
               type: string
               nullable: true
               enum:
-                - "2"
-                - "n"
-                - "s"
-                - "1"
-                - "t"
-                - "l"
-                - "3"
-                - "v"
-                - "4"
-                - "7"
-                - "5"
-                - "p"
-                - "u"
+                - '2'
+                - 'n'
+                - 's'
+                - '1'
+                - 't'
+                - 'l'
+                - '3'
+                - 'v'
+                - '4'
+                - '7'
+                - '5'
+                - 'p'
+                - 'u'
             description:
               type: string
               nullable: true
               enum:
-                - "motorbikes over 200cc or with a sidecar"
-                - "not applicable"
-                - "small psv (ie: less than or equal to 22 seats)"
-                - "motorbikes up to 200cc"
-                - "trailer"
-                - "large psv(ie: greater than 23 seats)"
-                - "3 wheelers"
-                - "heavy goods vehicle"
-                - "MOT class 4"
-                - "MOT class 7"
-                - "MOT class 5"
-                - "PSV of unknown or unspecified size"
-                - "Not Known"
+                - 'motorbikes over 200cc or with a sidecar'
+                - 'not applicable'
+                - 'small psv (ie: less than or equal to 22 seats)'
+                - 'motorbikes up to 200cc'
+                - 'trailer'
+                - 'large psv(ie: greater than 23 seats)'
+                - '3 wheelers'
+                - 'heavy goods vehicle'
+                - 'MOT class 4'
+                - 'MOT class 7'
+                - 'MOT class 5'
+                - 'PSV of unknown or unspecified size'
+                - 'Not Known'
           description:
             Mandatory only for motorcycles. 2 = MotorBikes over 200cc or with a sidecar, N = Not Applicable, S =
             Small PSV i.e less than or equal to 22 seats, 1 = Motorbikes upto
@@ -605,15 +605,15 @@ components:
           description: Used only for TRL
           nullable: true
         testTypes:
-          $ref: "#/components/schemas/testTypes"
+          $ref: '#/components/schemas/testTypes'
     testTypes:
       type: array
       nullable: true
       description: Nullable only for Cancelled tests.
       items:
-        $ref: "#/components/schemas/testTypeRecords"
+        $ref: '#/components/schemas/testTypeRecords'
     testTypeRecords:
-      $ref: "#/components/schemas/testTypeResults"
+      $ref: '#/components/schemas/testTypeResults'
     testTypeResults:
       type: object
       properties:
@@ -621,21 +621,21 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         lastUpdatedAt:
           type: string
           format: date-time
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         deletionFlag:
           type: boolean
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testCode:
           type: string
           maxLength: 4
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testTypeName:
           type: string
         name:
@@ -645,7 +645,7 @@ components:
         testNumber:
           type: string
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         certificateNumber:
           type: string
           nullable: true
@@ -655,17 +655,17 @@ components:
         certificateLink:
           type: string
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testExpiryDate:
           type: string
           format: date-time
           nullable: true
-          description: "Sent form FE only for LEC tests. For the rest of the test types it is not sent from FE, and calculated in the BE."
+          description: 'Sent form FE only for LEC tests. For the rest of the test types it is not sent from FE, and calculated in the BE.'
         testAnniversaryDate:
           type: string
           format: date-time
           nullable: true
-          description: "Not sent from FE, calculated in the BE."
+          description: 'Not sent from FE, calculated in the BE.'
         testTypeStartTimestamp:
           type: string
           format: date-time
@@ -779,14 +779,14 @@ components:
           nullable: true
 
         defects:
-          $ref: "#/components/schemas/defects"
+          $ref: '#/components/schemas/defects'
         customDefects:
-          $ref: "#/components/schemas/customDefects"
+          $ref: '#/components/schemas/customDefects'
     defects:
       type: array
       nullable: true
       items:
-        $ref: "#/components/schemas/defect"
+        $ref: '#/components/schemas/defect'
     defect:
       type: object
       properties:
@@ -852,12 +852,12 @@ components:
         deficiencyId:
           type: string
           nullable: true
-          pattern: "[a-z]"
+          pattern: '[a-z]'
           maxLength: 1
         deficiencySubId:
           type: string
           nullable: true
-          pattern: "^[mdclxvi]+$"
+          pattern: '^[mdclxvi]+$'
         deficiencyCategory:
           type: string
           enum:
@@ -885,7 +885,7 @@ components:
       type: array
       nullable: true
       items:
-        $ref: "#/components/schemas/customDefect"
+        $ref: '#/components/schemas/customDefect'
     customDefect:
       type: object
       properties:
@@ -904,4 +904,4 @@ security:
       - read
       - write
 servers:
-  - url: "https://url/api/v1"
+  - url: 'https://url/api/v1'

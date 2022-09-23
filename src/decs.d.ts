@@ -1,4 +1,4 @@
-declare module "openapi-enforcer" {
+declare module 'openapi-enforcer' {
   export function Enforcer(definition: string): Promise<OpenAPI>;
 
   export class OpenAPI {

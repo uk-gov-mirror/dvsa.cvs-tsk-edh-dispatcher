@@ -3,12 +3,12 @@ sqs:
     params:
       region: sqs
       endpoint: http://sqs:9324
-      apiVersion: "2012-11-05"
+      apiVersion: '2012-11-05'
     queueName:
       - cvs-update-store-queue
   remote:
     params:
-      apiVersion: "2012-11-05"
+      apiVersion: '2012-11-05'
     queueName:
       - cvs-update-store-${BRANCH}-queue
 

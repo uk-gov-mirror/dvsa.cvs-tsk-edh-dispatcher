@@ -4,12 +4,12 @@ info:
     This is the API spec for the integration between EDH and CVS for synchronising Activity records.
   version: 1.0.0
   title: Activity CVS->EDH integration
-  termsOfService: ""
+  termsOfService: ''
   contact:
     email: akothiyal@deloitte.co.uk
   license:
     name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
   /activities/{id}:
     post:
@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/activity"
+              $ref: '#/components/schemas/activity'
       parameters:
         - in: path
           name: id
@@ -29,19 +29,19 @@ paths:
           required: true
           description: Activity ID
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     put:
       summary: Update an activity.
@@ -51,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/activity"
+              $ref: '#/components/schemas/activity'
       parameters:
         - in: path
           name: id
@@ -60,19 +60,19 @@ paths:
           required: true
           description: Activity ID
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     delete:
       summary: Delete the identified activity - will probably never be used.
@@ -84,19 +84,19 @@ paths:
           required: true
           description: Activity ID
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
 components:
   securitySchemes:
@@ -104,8 +104,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "https://example.com/oauth/authorize"
-          tokenUrl: "https://example.com/oauth/token"
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
           scopes:
             read: Grants read access
             write: Grants write access
@@ -169,4 +169,4 @@ security:
       - read
       - write
 servers:
-  - url: "https://url/api/v1"
+  - url: 'https://url/api/v1'

@@ -1,27 +1,27 @@
-import { Logger } from "tslog";
-import { SQSRecord } from "aws-lambda";
-import { types } from "util";
-import { DispatchService } from "../../src/services/DispatchService";
-import { Body } from "../../src/models/interfaces";
-import { Configuration } from "../../src/utils/Configuration";
+import { Logger } from 'tslog';
+import { SQSRecord } from 'aws-lambda';
+import { types } from 'util';
+import { DispatchService } from '../../src/services/DispatchService';
+import { Body } from '../../src/models/interfaces';
+import { Configuration } from '../../src/utils/Configuration';
 
 const mockSQSRecord = {
   attributes: {
-    ApproximateReceiveCount: "",
-    SentTimestamp: "",
-    SenderId: "",
-    ApproximateFirstReceiveTimestamp: "",
+    ApproximateReceiveCount: '',
+    SentTimestamp: '',
+    SenderId: '',
+    ApproximateFirstReceiveTimestamp: '',
   },
-  awsRegion: "",
-  eventSource: "",
-  md5OfBody: "",
+  awsRegion: '',
+  eventSource: '',
+  md5OfBody: '',
   messageAttributes: {},
-  messageId: "",
-  receiptHandle: "",
+  messageId: '',
+  receiptHandle: '',
 };
 
-describe("Dispatch Service", () => {
-  describe("processEvent", () => {
+describe('Dispatch Service', () => {
+  describe('processEvent', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
@@ -33,61 +33,61 @@ describe("Dispatch Service", () => {
     }));
 
     const secretConfig = jest
-      .spyOn(Configuration.prototype, "getSecretConfig")
+      .spyOn(Configuration.prototype, 'getSecretConfig')
       .mockResolvedValue(
         Promise.resolve({
-          baseUrl: "",
-          apiKey: "",
-          stubBaseUrl: "",
-          stubApiKey: "",
-          host: "",
-        })
+          baseUrl: '',
+          apiKey: '',
+          stubBaseUrl: '',
+          stubApiKey: '',
+          host: '',
+        }),
       );
-    const sendRecordMock = jest.spyOn(DispatchService.prototype, "sendRecord");
-    const dlqMock = jest.spyOn(DispatchService.prototype, "sendRecordToDLQ");
-    const body = { test: { S: "value" } };
+    const sendRecordMock = jest.spyOn(DispatchService.prototype, 'sendRecord');
+    const dlqMock = jest.spyOn(DispatchService.prototype, 'sendRecordToDLQ');
+    const body = { test: { S: 'value' } };
     const svc = new DispatchService(
       new SQSMock(),
-      new Logger({ name: "DispatchServiceTest" })
+      new Logger({ name: 'DispatchServiceTest' }),
     );
 
-    describe("with invalid event type & Bad ARN", () => {
+    describe('with invalid event type & Bad ARN', () => {
       const event = {
-        eventName: "NOT_A_THING",
+        eventName: 'NOT_A_THING',
         dynamodb: { NewImage: {} },
       } as unknown as Body;
       const record: SQSRecord = {
         ...mockSQSRecord,
         body: JSON.stringify(event),
-        eventSourceARN: "something-wrong",
+        eventSourceARN: 'something-wrong',
       };
-      it("throws an Error", async () => {
+      it('throws an Error', async () => {
         expect.assertions(3);
         try {
           await svc.processSQSRecord(record);
         } catch (e) {
           if (types.isNativeError(e)) {
-            expect(e.message).toEqual("Unable to determine unique target");
+            expect(e.message).toEqual('Unable to determine unique target');
             expect(dlqMock).not.toHaveBeenCalled();
             expect(sendRecordMock).not.toHaveBeenCalled();
           } else {
-            fail("Error thrown is not a native error");
+            fail('Error thrown is not a native error');
           }
         }
       });
     });
 
-    describe("with invalid event type", () => {
+    describe('with invalid event type', () => {
       const event = {
-        eventName: "NOT_A_THING",
+        eventName: 'NOT_A_THING',
         dynamodb: { NewImage: {} },
       };
       const record: SQSRecord = {
         ...mockSQSRecord,
         body: JSON.stringify(event),
-        eventSourceARN: "something-test-results",
+        eventSourceARN: 'something-test-results',
       };
-      it("invokes sendRecordToDLQ", async () => {
+      it('invokes sendRecordToDLQ', async () => {
         expect.assertions(2);
         await svc.processSQSRecord(record);
         expect(dlqMock).toHaveBeenCalled();
@@ -95,20 +95,20 @@ describe("Dispatch Service", () => {
       });
     });
 
-    describe("with valid INSERT event type", () => {
+    describe('with valid INSERT event type', () => {
       const event = {
-        eventName: "INSERT",
+        eventName: 'INSERT',
         dynamodb: {
-          Keys: { testResultId: { S: "123" } },
+          Keys: { testResultId: { S: '123' } },
           NewImage: body,
         },
       };
       const record: SQSRecord = {
         ...mockSQSRecord,
         body: JSON.stringify(event),
-        eventSourceARN: "something-test-results",
+        eventSourceARN: 'something-test-results',
       };
-      it("invokes the sendRecord method", async () => {
+      it('invokes the sendRecord method', async () => {
         expect.assertions(2);
         const output = await svc.processSQSRecord(record);
         expect(output).toBeUndefined();
@@ -116,20 +116,20 @@ describe("Dispatch Service", () => {
       });
     });
 
-    describe("with valid MODIFY event type", () => {
+    describe('with valid MODIFY event type', () => {
       const event = {
-        eventName: "MODIFY",
+        eventName: 'MODIFY',
         dynamodb: {
-          Keys: { testResultId: { S: "123" } },
+          Keys: { testResultId: { S: '123' } },
           NewImage: body,
         },
       };
       const record: SQSRecord = {
         ...mockSQSRecord,
         body: JSON.stringify(event),
-        eventSourceARN: "something-test-results",
+        eventSourceARN: 'something-test-results',
       };
-      it("invokes the sendRecord method", async () => {
+      it('invokes the sendRecord method', async () => {
         expect.assertions(2);
         const output = await svc.processSQSRecord(record);
         expect(output).toBeUndefined();
@@ -137,20 +137,20 @@ describe("Dispatch Service", () => {
       });
     });
 
-    describe("with valid REMOVE event type", () => {
+    describe('with valid REMOVE event type', () => {
       const event = {
-        eventName: "REMOVE",
+        eventName: 'REMOVE',
         dynamodb: {
-          Keys: { testResultId: { S: "123" } },
+          Keys: { testResultId: { S: '123' } },
           OldImage: {},
         },
       };
       const record: SQSRecord = {
         ...mockSQSRecord,
         body: JSON.stringify(event),
-        eventSourceARN: "something-test-results",
+        eventSourceARN: 'something-test-results',
       };
-      it("invokes the sendRecord method", async () => {
+      it('invokes the sendRecord method', async () => {
         expect.assertions(2);
         const output = await svc.processSQSRecord(record);
         expect(output).toBeUndefined();

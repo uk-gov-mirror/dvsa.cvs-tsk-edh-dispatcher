@@ -4,12 +4,12 @@ info:
     This is the API spec for the integration between EDH and CVS for synchronising Vehicle records.
   version: 1.0.0
   title: Vehicles CVS->EDH integration
-  termsOfService: ""
+  termsOfService: ''
   contact:
     email: akothiyal@deloitte.co.uk
   license:
     name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
   /vehicles/{systemNumber}:
     post:
@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/completeTechRecordDB"
+              $ref: '#/components/schemas/completeTechRecordDB'
       parameters:
         - in: path
           name: systemNumber
@@ -29,19 +29,19 @@ paths:
           required: true
           description: Unique Identifier for a vehicle record
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     put:
       summary: Update an Tech Record.
@@ -51,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/completeTechRecordDB"
+              $ref: '#/components/schemas/completeTechRecordDB'
       parameters:
         - in: path
           name: systemNumber
@@ -60,19 +60,19 @@ paths:
           required: true
           description: Unique Identifier for a vehicle record
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
     delete:
       summary: Delete the identified Tech Record - will probably never be used.
@@ -84,19 +84,19 @@ paths:
           required: true
           description: Unique Identifier for a vehicle record
       responses:
-        "202":
+        '202':
           description: Accepted
-        "400":
+        '400':
           description: Bad Request
-        "401":
+        '401':
           description: Unauthorized
-        "403":
+        '403':
           description: Forbidden
-        "404":
+        '404':
           description: Operation Not Supported
-        "429":
+        '429':
           description: Too Many Requests
-        "500":
+        '500':
           description: Internal Server Error
 components:
   securitySchemes:
@@ -104,8 +104,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "https://example.com/oauth/authorize"
-          tokenUrl: "https://example.com/oauth/token"
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
           scopes:
             read: Grants read access
             write: Grants write access
@@ -113,7 +113,7 @@ components:
     techRecords:
       type: array
       items:
-        $ref: "#/components/schemas/techRecord"
+        $ref: '#/components/schemas/techRecord'
     techRecord:
       type: object
       properties:
@@ -123,11 +123,11 @@ components:
         createdAt:
           type: string
           format: date-time
-          description: "Used for all vehicle types"
+          description: 'Used for all vehicle types'
         lastUpdatedAt:
           type: string
           format: date-time
-          description: "Used for all vehicle types"
+          description: 'Used for all vehicle types'
         make:
           type: string
           maxLength: 30
@@ -191,9 +191,9 @@ components:
           nullable: true
           description: Used for all vehicle types
         authIntoService:
-          $ref: "#/components/schemas/authIntoService"
+          $ref: '#/components/schemas/authIntoService'
         lettersOfAuth:
-          $ref: "#/components/schemas/lettersOfAuth"
+          $ref: '#/components/schemas/lettersOfAuth'
         alterationMarker:
           type: boolean
           nullable: true
@@ -238,15 +238,15 @@ components:
           nullable: true
           description: Used only for HGV
         applicantDetails:
-          $ref: "#/components/schemas/applicantDetailsProperties"
+          $ref: '#/components/schemas/applicantDetailsProperties'
         purchaserDetails:
-          $ref: "#/components/schemas/purchaserDetails"
+          $ref: '#/components/schemas/purchaserDetails'
         manufacturerDetails:
-          $ref: "#/components/schemas/manufacturerDetails"
+          $ref: '#/components/schemas/manufacturerDetails'
         microfilm:
-          $ref: "#/components/schemas/microfilm"
+          $ref: '#/components/schemas/microfilm'
         plates:
-          $ref: "#/components/schemas/plates"
+          $ref: '#/components/schemas/plates'
         chassisMake:
           type: string
           maxLength: 20
@@ -310,17 +310,17 @@ components:
         manufactureYear:
           type: number
           maximum: 9999
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
         regnDate:
           type: string
           format: date
           nullable: true
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
         firstUseDate:
           type: string
           format: date
           nullable: true
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         coifDate:
           type: string
           format: date
@@ -329,7 +329,7 @@ components:
         ntaNumber:
           type: string
           maxLength: 40
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
           nullable: true
         coifSerialNumber:
           description: Used only for PSV
@@ -344,7 +344,7 @@ components:
         conversionRefNo:
           type: string
           maxLength: 10
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
           nullable: true
         seatsLowerDeck:
           type: number
@@ -382,10 +382,10 @@ components:
         reasonForCreation:
           type: string
           maxLength: 100
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv and motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv and motorcycle'
         statusCode:
           type: string
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
           enum:
             - archived
             - current
@@ -405,11 +405,11 @@ components:
         grossGbWeight:
           type: number
           maximum: 99999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         grossDesignWeight:
           type: number
           maximum: 99999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         trainGbWeight:
           type: number
           maximum: 99999
@@ -552,13 +552,13 @@ components:
         noOfAxles:
           type: number
           maximum: 99
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
         brakeCode:
           type: string
           maxLength: 6
           description: Used only for PSV
         adrDetails:
-          $ref: "#/components/schemas/adrDetails"
+          $ref: '#/components/schemas/adrDetails'
         createdByName:
           type: string
           nullable: true
@@ -591,34 +591,34 @@ components:
               type: string
               nullable: true
               enum:
-                - "2"
-                - "n"
-                - "s"
-                - "1"
-                - "t"
-                - "l"
-                - "3"
-                - "v"
-                - "4"
-                - "7"
-                - "5"
+                - '2'
+                - 'n'
+                - 's'
+                - '1'
+                - 't'
+                - 'l'
+                - '3'
+                - 'v'
+                - '4'
+                - '7'
+                - '5'
             description:
               type: string
               enum:
-                - "motorbikes over 200cc or with a sidecar"
-                - "not applicable"
-                - "small psv (ie: less than or equal to 22 seats)"
-                - "motorbikes up to 200cc"
-                - "trailer"
-                - "large psv(ie: greater than 23 seats)"
-                - "3 wheelers"
-                - "heavy goods vehicle"
-                - "MOT class 4"
-                - "MOT class 7"
-                - "MOT class 5"
-                - "PSV of unknown or unspecified size"
-                - "Not Known"
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle. Mandatory only for motorcycle."
+                - 'motorbikes over 200cc or with a sidecar'
+                - 'not applicable'
+                - 'small psv (ie: less than or equal to 22 seats)'
+                - 'motorbikes up to 200cc'
+                - 'trailer'
+                - 'large psv(ie: greater than 23 seats)'
+                - '3 wheelers'
+                - 'heavy goods vehicle'
+                - 'MOT class 4'
+                - 'MOT class 7'
+                - 'MOT class 5'
+                - 'PSV of unknown or unspecified size'
+                - 'Not Known'
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle. Mandatory only for motorcycle.'
         vehicleSubclass:
           type: array
           items:
@@ -634,7 +634,7 @@ components:
             - car
             - lgv
             - motorcycle
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
         vehicleSize:
           type: string
           enum:
@@ -663,13 +663,13 @@ components:
             - four-in-line
             - dolly
             - full drawbar
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         brakes:
-          $ref: "#/components/schemas/brakes"
+          $ref: '#/components/schemas/brakes'
         axles:
-          $ref: "#/components/schemas/axles"
+          $ref: '#/components/schemas/axles'
         dda:
-          $ref: "#/components/schemas/dda"
+          $ref: '#/components/schemas/dda'
     adrDetails:
       type: object
       nullable: true
@@ -888,7 +888,7 @@ components:
                 productListUnNo:
                   type: array
                   nullable: true
-                  description: "Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’"
+                  description: 'Optional. Applicable only IF vehicleDetails.type contains the word ‘tank’ or ‘battery’'
                   items:
                     type: string
                 productList:
@@ -945,11 +945,11 @@ components:
         dtpNumber:
           type: string
           maxLength: 6
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         brakeForceWheelsNotLocked:
-          $ref: "#/components/schemas/brakeForceWheelsNotLocked"
+          $ref: '#/components/schemas/brakeForceWheelsNotLocked'
         brakeForceWheelsUpToHalfLocked:
-          $ref: "#/components/schemas/brakeForceWheelsUpToHalfLocked"
+          $ref: '#/components/schemas/brakeForceWheelsUpToHalfLocked'
         loadSensingValve:
           type: boolean
           description: Used only for TRL
@@ -990,24 +990,24 @@ components:
     axles:
       type: array
       items:
-        $ref: "#/components/schemas/weights"
+        $ref: '#/components/schemas/weights'
     weights:
       type: object
       properties:
         axleNumber:
           type: number
           maximum: 99999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         parkingBrakeMrk:
           type: boolean
           nullable: true
-          description: "Used for all vehicle types - PSV, HGV and TRL. Optional for HGV"
+          description: 'Used for all vehicle types - PSV, HGV and TRL. Optional for HGV'
         weights:
-          $ref: "#/components/schemas/axleWeightProperties"
+          $ref: '#/components/schemas/axleWeightProperties'
         tyres:
-          $ref: "#/components/schemas/axleTyreProperties"
+          $ref: '#/components/schemas/axleTyreProperties'
         brakes:
-          $ref: "#/components/schemas/axleBrakeProperties"
+          $ref: '#/components/schemas/axleBrakeProperties'
     axleWeightProperties:
       type: object
       properties:
@@ -1022,7 +1022,7 @@ components:
         gbWeight:
           type: number
           maximum: 99999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         eecWeight:
           type: number
           maximum: 99999
@@ -1031,7 +1031,7 @@ components:
         designWeight:
           type: number
           maximum: 99999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
     plates:
       type: array
       nullable: true
@@ -1364,22 +1364,22 @@ components:
         tyreSize:
           type: string
           maxLength: 12
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         plyRating:
           type: string
           maxLength: 2
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
           nullable: true
         fitmentCode:
           type: string
           enum:
             - double
             - single
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
         dataTrAxles:
           type: number
           maximum: 999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
           nullable: true
         speedCategorySymbol:
           type: string
@@ -1403,7 +1403,7 @@ components:
         tyreCode:
           type: number
           maximum: 9999
-          description: "Used for all vehicle types - PSV, HGV and TRL"
+          description: 'Used for all vehicle types - PSV, HGV and TRL'
     axleBrakeProperties:
       type: object
       description: Used only for TRL
@@ -1441,16 +1441,16 @@ components:
           type: string
           minLength: 1
           maxLength: 21
-          description: "Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle"
+          description: 'Used for all vehicle types - PSV, HGV, TRL, car, lgv, motorcycle'
         trailerId:
           type: string
           maxLength: 8
           description: Used only for TRL
         techRecord:
-          $ref: "#/components/schemas/techRecords"
+          $ref: '#/components/schemas/techRecords'
 security:
   - OAuth2:
       - read
       - write
 servers:
-  - url: "https://url/api/v1"
+  - url: 'https://url/api/v1'

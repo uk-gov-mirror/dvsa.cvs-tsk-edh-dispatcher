@@ -3,14 +3,14 @@ import SQS, {
   MessageBodyAttributeMap,
   SendMessageRequest,
   SendMessageResult,
-} from "aws-sdk/clients/sqs";
-import { PromiseResult } from "aws-sdk/lib/request";
-import { AWSError } from "aws-sdk";
-import { Logger } from "tslog";
-import { captureAWSClient } from "aws-xray-sdk";
-import { Configuration } from "../utils/Configuration";
-import { ERROR } from "../models/enums";
-import { Config } from "../models/interfaces";
+} from 'aws-sdk/clients/sqs';
+import { PromiseResult } from 'aws-sdk/lib/request';
+import { AWSError } from 'aws-sdk';
+import { Logger } from 'tslog';
+import { captureAWSClient } from 'aws-xray-sdk';
+import { Configuration } from '../utils/Configuration';
+import { ERROR } from '../models/enums';
+import { Config } from '../models/interfaces';
 
 /**
  * Service class for interfacing with the Simple Queue Service
@@ -59,7 +59,7 @@ class SQService {
   public async sendMessage(
     messageBody: string,
     queueName: string,
-    messageAttributes?: MessageBodyAttributeMap
+    messageAttributes?: MessageBodyAttributeMap,
   ): Promise<PromiseResult<SendMessageResult, AWSError>> {
     this.logger.debug(`Sending message to ${queueName}: `, messageBody);
 

@@ -1,4 +1,4 @@
-import { StreamRecord } from "aws-lambda";
+import { StreamRecord } from 'aws-lambda';
 
 interface SQSConfig {
   params: {
@@ -16,17 +16,17 @@ export interface Config {
 }
 
 export interface Body {
-  eventType: "INSERT" | "MODIFY" | "REMOVE";
+  eventType: 'INSERT' | 'MODIFY' | 'REMOVE';
   body: StreamRecord;
 }
 
 export interface TargetRecord {
   eventType: string;
   body:
-    | {
-        [key: string]: unknown;
-      }
-    | undefined;
+  | {
+    [key: string]: unknown;
+  }
+  | undefined;
 }
 
 export interface Target {

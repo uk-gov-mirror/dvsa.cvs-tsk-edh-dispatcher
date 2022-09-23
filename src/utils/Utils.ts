@@ -1,9 +1,9 @@
 /**
  * Utils functions
  */
-import { Configuration } from "./Configuration";
-import { ERROR } from "../models/enums";
-import { Target, TargetConfig } from "../models/interfaces";
+import { Configuration } from './Configuration';
+import { ERROR } from '../models/enums';
+import { Target, TargetConfig } from '../models/interfaces';
 
 export const getTargetFromSourceARN = (arn: string): Target => {
   const targets: TargetConfig = Configuration.getInstance().getTargets();

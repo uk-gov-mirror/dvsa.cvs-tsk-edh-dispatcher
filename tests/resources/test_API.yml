@@ -4,12 +4,12 @@ info:
     This is the test API spec.
   version: 1.0.0
   title: Test Results Microservice
-  termsOfService: ""
+  termsOfService: ''
   contact:
     email: test@test.com
   license:
     name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 paths:
   /test:
@@ -21,15 +21,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/completeTestResults"
+              $ref: '#/components/schemas/completeTestResults'
       responses:
-        "201":
+        '201':
           description: Test records created
-        "401":
+        '401':
           description: Not authenticated
-        "403":
+        '403':
           description: Unauthorised Access
-        "404":
+        '404':
           description: Operation not supported
 components:
   securitySchemes:
@@ -37,8 +37,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "https://example.com/oauth/authorize"
-          tokenUrl: "https://example.com/oauth/token"
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
           scopes:
             read: Grants read access
             write: Grants write access
@@ -59,4 +59,4 @@ security:
       - read
       - write
 servers:
-  - url: "https://url/api/v1"
+  - url: 'https://url/api/v1'
