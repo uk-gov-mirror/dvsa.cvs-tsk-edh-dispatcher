@@ -1,8 +1,11 @@
-import { Logger } from 'tslog';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable jest/no-jasmine-globals */
+/* eslint-disable jest/no-conditional-expect */
 import { SQSRecord } from 'aws-lambda';
+import { Logger } from 'tslog';
 import { types } from 'util';
-import { DispatchService } from '../../src/services/DispatchService';
 import { Body } from '../../src/models/interfaces';
+import { DispatchService } from '../../src/services/DispatchService';
 import { Configuration } from '../../src/utils/Configuration';
 
 const mockSQSRecord = {
@@ -67,7 +70,7 @@ describe('Dispatch Service', () => {
           await svc.processSQSRecord(record);
         } catch (e) {
           if (types.isNativeError(e)) {
-            expect(e.message).toEqual('Unable to determine unique target');
+            expect(e.message).toBe('Unable to determine unique target');
             expect(dlqMock).not.toHaveBeenCalled();
             expect(sendRecordMock).not.toHaveBeenCalled();
           } else {

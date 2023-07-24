@@ -1,7 +1,9 @@
+/* eslint-disable jest/no-jasmine-globals */
+/* eslint-disable jest/no-conditional-expect */
 import { types } from 'util';
-import { getTargetFromSourceARN } from '../../src/utils/Utils';
-import { Configuration } from '../../src/utils/Configuration';
 import { ERROR } from '../../src/models/enums';
+import { Configuration } from '../../src/utils/Configuration';
+import { getTargetFromSourceARN } from '../../src/utils/Utils';
 
 describe('Utils', () => {
   describe('getTargetFromSourceARN', () => {

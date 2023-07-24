@@ -1,8 +1,9 @@
-import { Logger } from 'tslog';
-import { readFileSync } from 'fs';
-import { DynamoDB } from 'aws-sdk';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { DynamoDBRecord } from 'aws-lambda';
-import { Target, TargetRecord } from '../../src/models/interfaces';
+import { DynamoDB } from 'aws-sdk';
+import { readFileSync } from 'fs';
+import { Logger } from 'tslog';
+import { Target } from '../../src/models/interfaces';
 import { DispatchService } from '../../src/services/DispatchService';
 
 describe('isValidMessageBody', () => {
@@ -40,7 +41,7 @@ describe('isValidMessageBody', () => {
         new Logger({ name: 'DispatchServiceValidation' }),
       );
       const output = await svc.isValidMessageBody(invalidRecord, target);
-      expect(output).toEqual(false);
+      expect(output).toBe(false);
     });
     it("returns true when evaluating a 'good' record against a valid spec", async () => {
       const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
@@ -54,7 +55,7 @@ describe('isValidMessageBody', () => {
         dynamodb: { NewImage: validRecord },
       };
       const output = await svc.isValidMessageBody(body, target);
-      expect(output).toEqual(true);
+      expect(output).toBe(true);
     });
   });
   describe('when validation = false', () => {
@@ -71,7 +72,7 @@ describe('isValidMessageBody', () => {
     it('always returns true', async () => {
       const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
       const output = await svc.isValidMessageBody(invalidRecord, target);
-      expect(output).toEqual(true);
+      expect(output).toBe(true);
     });
   });
   describe('when validation is not set in secrets', () => {
@@ -81,7 +82,7 @@ describe('isValidMessageBody', () => {
     it('always returns true', async () => {
       const svc = new DispatchService(new (jest.fn())(), new (jest.fn())());
       const output = await svc.isValidMessageBody(invalidRecord, target);
-      expect(output).toEqual(true);
+      expect(output).toBe(true);
     });
   });
 });

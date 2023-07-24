@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-conditional-expect */
 import { Context, SQSEvent } from 'aws-lambda';
 import { edhDispatcher } from '../../src/functions/edhDispatcher';
 import { DispatchService } from '../../src/services/DispatchService';
@@ -12,7 +13,7 @@ describe('edhDispatcher function', () => {
         mockContext,
         () => {},
       );
-      expect(result).toBe(undefined);
+      expect(result).toBeUndefined();
     });
   });
 
@@ -33,7 +34,7 @@ describe('edhDispatcher function', () => {
         .spyOn(DispatchService.prototype, 'processSQSRecord')
         .mockImplementation(processMock);
       await edhDispatcher(event, mockContext, () => {});
-      expect(processMock).toBeCalledWith(event.Records[0]);
+      expect(processMock).toHaveBeenCalledWith(event.Records[0]);
     });
     describe('and ProcessEvent returns a rejection', () => {
       it('throws the error upwards', async () => {
@@ -56,7 +57,7 @@ describe('edhDispatcher function', () => {
           await edhDispatcher(event, mockContext, () => {});
         } catch (e) {
           expect(e).toEqual(error);
-          expect(processMock).toBeCalledWith(event.Records[0]);
+          expect(processMock).toHaveBeenCalledWith(event.Records[0]);
         }
       });
     });
@@ -78,7 +79,7 @@ describe('edhDispatcher function', () => {
         expect.assertions(2);
         const output = await edhDispatcher(event, mockContext, () => {});
         expect(output).toBeUndefined();
-        expect(processMock).toBeCalledWith(event.Records[0]);
+        expect(processMock).toHaveBeenCalledWith(event.Records[0]);
       });
     });
   });

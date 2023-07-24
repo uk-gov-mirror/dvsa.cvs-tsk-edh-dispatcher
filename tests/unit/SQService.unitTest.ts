@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable jest/no-jasmine-globals */
 import { Logger } from 'tslog';
 import { types } from 'util';
+import { ERROR } from '../../src/models/enums';
 import { SQService } from '../../src/services/SQService';
 import { Configuration } from '../../src/utils/Configuration';
-import { ERROR } from '../../src/models/enums';
 import Mock = jest.Mock;
 
 describe('SQService', () => {
@@ -22,7 +25,7 @@ describe('SQService', () => {
         new Logger({ name: 'SQServiceTestInit' }),
       );
       expect(svc.getSQSClient()).toEqual(liveMock);
-      expect(svc.getConfig()).not.toBeUndefined();
+      expect(svc.getConfig()).toBeDefined();
     });
     describe('with No config available', () => {
       it('throws an error', () => {
@@ -74,7 +77,7 @@ describe('SQService', () => {
       it("doesn't throw an error", async () => {
         expect.assertions(3);
         const output = await svc.sendMessage('my thing', 'aQueue');
-        expect(output).toEqual('It worked');
+        expect(output).toBe('It worked');
         expect(sendMock).toHaveBeenCalledWith(expectedSendArgs);
         expect(sendMock).toHaveBeenCalledTimes(1);
       });
@@ -87,7 +90,7 @@ describe('SQService', () => {
           expect.assertions(3);
           const attrMap = { a: { DataType: 'b' } };
           const output = await svc.sendMessage('my thing', 'aQueue', attrMap);
-          expect(output).toEqual('It worked');
+          expect(output).toBe('It worked');
           expect(sendMock).toHaveBeenCalledWith({
             ...expectedSendArgs,
             MessageAttributes: attrMap,
